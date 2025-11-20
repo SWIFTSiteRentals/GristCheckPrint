@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Check Print Preview</title>
-  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <style>
 
     /* ===== CUSTOM FONTS ===== */
@@ -212,7 +211,7 @@
     /* ===== MICR LINE (E-13B) ===== */
     .micr-line {
       position: absolute;
-      bottom: 0.12in;              /* lifted toward center of the 7/16" band */
+      bottom: 0.12in;
       left: 0.30in;
       right: 0.30in;
       font-family: 'MICR', monospace;
@@ -222,6 +221,7 @@
     }
 
   </style>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 </head>
 <body>
   <div class="page">
@@ -232,17 +232,17 @@
       <!-- TOP HEADER -->
       <div class="top-row">
         <div class="account-block">
-          <div class="account-name">{{AccountHolderName}}</div>
-          {{StreetAddressLine1}}<br>
-          {{StreetAddressLine2}}<br>
-          {{City}}, {{State}} {{Zip}}
+          <div class="account-name" id="field-accountname">{{AccountHolderName}}</div>
+          <div id="field-addr1">{{StreetAddressLine1}}</div>
+          <div id="field-addr2">{{StreetAddressLine2}}</div>
+          <div id="field-citystatezip">{{City}}, {{State}} {{Zip}}</div>
         </div>
 
         <div class="date-block">
-          Date: <span class="date-line">{{CheckDate}}</span>
+          Date: <span class="date-line" id="field-checkdate">{{CheckDate}}</span>
         </div>
 
-        <div class="check-number-block">
+        <div class="check-number-block" id="field-checknum">
           {{CheckNumber}}
         </div>
       </div>
@@ -251,9 +251,9 @@
       <!-- PAYEE ROW -->
       <div class="payee-row">
         <div class="payee-label">Pay to the<br>Order of</div>
-        <div class="payee-line">{{PayTo}}</div>
+        <div class="payee-line" id="field-payto">{{PayTo}}</div>
         <div class="amount-block-inline">
-          $ <div class="amount-box">{{Amount}}</div>
+          $ <div class="amount-box" id="field-amount">{{Amount}}</div>
         </div>
       </div>
 
@@ -262,7 +262,7 @@
       <div class="amount-words-row">
         <div>***</div>
         <div class="amount-words-line">
-          <span class="amount-words-text">{{AmountInWords}}</span>
+          <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
         </div>
         <div>Dollars</div>
       </div>
@@ -271,7 +271,7 @@
       <!-- BANK LOGO -->
       <div class="bank-row">
         <div class="bank-logo-block">
-          <div class="bank-logo">{{BankName}} LOGO</div>
+          <div class="bank-logo" id="field-banklogo">{{BankName}} LOGO</div>
         </div>
       </div>
 
@@ -280,7 +280,7 @@
       <div class="bottom-row">
         <div class="memo-container">
           <div>Memo:</div>
-          <div class="memo-line">{{Memo}}</div>
+          <div class="memo-line" id="field-memo">{{Memo}}</div>
         </div>
 
         <div class="signature-container">
@@ -290,57 +290,44 @@
 
 
       <!-- MICR -->
-      <div class="micr-line">
+      <div class="micr-line" id="field-micr">
         {{MicrLine}}
       </div>
 
     </div>
 
   </div>
-  
+
   <script>
-  // Tell Grist what we want: read access and some column mappings
-  grist.ready({
-    requiredAccess: 'read table',
-    columns: [
-      { name: 'PayTo',       title: 'Pay To' },
-      { name: 'Amount',      title: 'Amount' },
-      { name: 'CheckNumber', title: 'Check Number' },
-      { name: 'CheckDate',   title: 'Check Date' },
-      { name: 'Memo',        title: 'Memo' },
-      { name: 'MicrLine',    title: 'MICR Line', optional: true }
-    ]
-  });
+    // Listen for selected row from Grist and populate fields
+    grist.ready();
 
-  // Whenever you change the selected row, this fires
-  grist.onRecord(function(record) {
-    if (!record) return;
-    console.log('Grist record:', record);
-  });
-</script>
-
-
-  
-
-<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-<script>
-  // Simple hookup: listen to the selected record
-  grist.ready();
-
-  grist.onRecord(function(record) {
-    if (!record) return;
-    console.log('Selected row:', record);
-
-    // Update "Pay to the order of" line
-    const payeeEl = document.querySelector('.payee-line');
-    if (payeeEl) {
-      // Property name matches what you saw in the console: Pay_To
-      payeeEl.textContent = record.Pay_To || '';
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (value == null) {
+        el.textContent = '';
+      } else {
+        el.textContent = String(value);
+      }
     }
-  });
-</script>
 
+    grist.onRecord(function(record) {
+      if (!record) return;
+      console.log('Selected row:', record);
 
+      // These property names match what you saw in the console
+      setText('field-payto',   record.Pay_To);
+      setText('field-amount',  record.Amount);
+      setText('field-checknum', record.Check_Number);
+      setText('field-checkdate', record.Check_Date);
+      setText('field-memo',    record.Memo);
 
+      // MICR column is optional; name it MicrLine or Micr_Line in Grist
+      setText('field-micr', record.MicrLine || record.Micr_Line || '');
+
+      // Amount-in-words we can handle later in JS; for now leave placeholder
+    });
+  </script>
 </body>
 </html>
