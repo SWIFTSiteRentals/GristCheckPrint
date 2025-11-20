@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Check Print Preview</title>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <style>
 
     /* ===== CUSTOM FONTS ===== */
@@ -296,5 +297,27 @@
     </div>
 
   </div>
+  
+  <script>
+  // Tell Grist what we want: read access and some column mappings
+  grist.ready({
+    requiredAccess: 'read table',
+    columns: [
+      { name: 'PayTo',       title: 'Pay To' },
+      { name: 'Amount',      title: 'Amount' },
+      { name: 'CheckNumber', title: 'Check Number' },
+      { name: 'CheckDate',   title: 'Check Date' },
+      { name: 'Memo',        title: 'Memo' },
+      { name: 'MicrLine',    title: 'MICR Line', optional: true }
+    ]
+  });
+
+  // Whenever you change the selected row, this fires
+  grist.onRecord(function(record) {
+    if (!record) return;
+    console.log('Grist record:', record);
+  });
+</script>
+
 </body>
 </html>
