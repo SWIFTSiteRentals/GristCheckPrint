@@ -319,15 +319,17 @@
   });
 </script>
 
+
+  
+
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <script>
-  grist.ready({
-    requiredAccess: 'read table',
-  });
+  // Simple: no required columns, no mapping UI
+  grist.ready();
 
   grist.onRecord(function(record) {
     if (!record) return;
-    console.log("Selected row:", record);
+    console.log('Selected row:', record);
   });
 </script>
 
