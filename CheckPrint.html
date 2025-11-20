@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Check Print Preview</title>
+  <style>
+
+    /* ===== CUSTOM FONTS ===== */
+    @font-face {
+      font-family: 'Norwester';
+      src: url('Norwester.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('OpenSans-Regular.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'Lacquer';
+      src: url('Lacquer-Regular.woff2') format('woff2');
+    }
+
+    @font-face {
+      font-family: 'MICR';
+      src: url('MICREncoding.woff2') format('woff2');
+    }
+
+
+    /* ===== PAGE SETUP ===== */
+    @page {
+      size: 8.5in 11in;
+      margin: 0;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sans', Arial, sans-serif;
+      font-size: 10.5px;
+    }
+
+    .page {
+      width: 8.5in;
+      height: 11in;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+
+    /* ===== CHECK AREA (EXACT 3.50") ===== */
+    .check-area {
+      width: 100%;
+      height: 3.50in;                 /* exact top-check height */
+      padding: 0.18in 0.25in 0.10in;  /* top padding avoids unprintable zone */
+      box-sizing: border-box;
+      position: relative;
+    }
+
+
+    /* ===== TOP HEADER ===== */
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .account-block {
+      max-width: 55%;
+      line-height: 1.15;
+    }
+
+    .account-name {
+      font-family: 'Norwester', 'Open Sans', Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+    }
+
+    .date-block {
+      font-size: 10px;
+      margin-top: 0.05in;
+    }
+
+    .date-line {
+      display: inline-block;
+      min-width: 1.1in;
+      border-bottom: 1px solid #000;
+      margin-left: 0.10in;
+    }
+
+    .check-number-block {
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 0.05in;
+    }
+
+
+    /* ===== PAYEE ROW ===== */
+    .payee-row {
+      margin-top: 0.18in;
+      display: flex;
+      align-items: baseline;
+      gap: 0.10in;
+    }
+
+    .payee-label {
+      white-space: nowrap;
+    }
+
+    .payee-line {
+      border-bottom: 1px solid #000;
+      flex: 1;
+      padding-bottom: 0.03in;
+    }
+
+    .amount-block-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.05in;
+      white-space: nowrap;
+    }
+
+    .amount-box {
+      border: 1px solid #000;
+      padding: 0.04in 0.10in;
+      min-width: 1.0in;
+      text-align: right;
+      font-size: 11px;
+    }
+
+
+    /* ===== AMOUNT IN WORDS ===== */
+    .amount-words-row {
+      margin-top: 0.15in;
+      display: flex;
+      align-items: baseline;
+      gap: 0.08in;
+    }
+
+    .amount-words-line {
+      border-bottom: 1px solid #000;
+      flex: 1;
+      padding-bottom: 0.03in;
+    }
+
+    .amount-words-text {
+      font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
+      font-size: 11px;
+    }
+
+
+    /* ===== BANK LOGO ROW ===== */
+    .bank-row {
+      margin-top: 0.18in;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .bank-logo-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05in;
+    }
+
+    .bank-logo {
+      width: 2.4in;
+      height: 0.65in;
+      border: 1px solid #ccc; /* placeholder frame */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      text-align: center;
+    }
+
+
+    /* ===== MEMO + SIGNATURE AREA ===== */
+    .bottom-row {
+      margin-top: 0.22in;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 10px;
+    }
+
+    .memo-container {
+      display: flex;
+      align-items: baseline;
+      gap: 0.10in;
+      margin-bottom: 0.05in;       /* lifts memo slightly above signature */
+    }
+
+    .memo-line {
+      border-bottom: 1px solid #000;
+      width: 2.6in;                /* shorter memo line */
+      padding-bottom: 0.03in;
+    }
+
+    .signature-container {
+      margin-right: 0.50in;        /* shift line left so right end under amount center */
+    }
+
+    .signature-line {
+      border-bottom: 1px solid #000;
+      margin-top: 0.10in;
+      width: 2.5in;
+    }
+
+
+    /* ===== MICR LINE (E-13B) ===== */
+    .micr-line {
+      position: absolute;
+      bottom: 0.12in;              /* lifted toward center of the 7/16" band */
+      left: 0.30in;
+      right: 0.30in;
+      font-family: 'MICR', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-align: left;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ================= CHECK AREA ================= -->
+    <div class="check-area">
+
+      <!-- TOP HEADER -->
+      <div class="top-row">
+        <div class="account-block">
+          <div class="account-name">{{AccountHolderName}}</div>
+          {{StreetAddressLine1}}<br>
+          {{StreetAddressLine2}}<br>
+          {{City}}, {{State}} {{Zip}}
+        </div>
+
+        <div class="date-block">
+          Date: <span class="date-line">{{CheckDate}}</span>
+        </div>
+
+        <div class="check-number-block">
+          {{CheckNumber}}
+        </div>
+      </div>
+
+
+      <!-- PAYEE ROW -->
+      <div class="payee-row">
+        <div class="payee-label">Pay to the<br>Order of</div>
+        <div class="payee-line">{{PayTo}}</div>
+        <div class="amount-block-inline">
+          $ <div class="amount-box">{{Amount}}</div>
+        </div>
+      </div>
+
+
+      <!-- AMOUNT IN WORDS -->
+      <div class="amount-words-row">
+        <div>***</div>
+        <div class="amount-words-line">
+          <span class="amount-words-text">{{AmountInWords}}</span>
+        </div>
+        <div>Dollars</div>
+      </div>
+
+
+      <!-- BANK LOGO -->
+      <div class="bank-row">
+        <div class="bank-logo-block">
+          <div class="bank-logo">{{BankName}} LOGO</div>
+        </div>
+      </div>
+
+
+      <!-- MEMO + SIGNATURE -->
+      <div class="bottom-row">
+        <div class="memo-container">
+          <div>Memo:</div>
+          <div class="memo-line">{{Memo}}</div>
+        </div>
+
+        <div class="signature-container">
+          <div class="signature-line"></div>
+        </div>
+      </div>
+
+
+      <!-- MICR -->
+      <div class="micr-line">
+        {{MicrLine}}
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>
