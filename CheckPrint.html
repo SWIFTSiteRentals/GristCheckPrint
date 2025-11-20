@@ -324,14 +324,22 @@
 
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <script>
-  // Simple: no required columns, no mapping UI
+  // Simple hookup: listen to the selected record
   grist.ready();
 
   grist.onRecord(function(record) {
     if (!record) return;
     console.log('Selected row:', record);
+
+    // Update "Pay to the order of" line
+    const payeeEl = document.querySelector('.payee-line');
+    if (payeeEl) {
+      // Property name matches what you saw in the console: Pay_To
+      payeeEl.textContent = record.Pay_To || '';
+    }
   });
 </script>
+
 
 
 </body>
