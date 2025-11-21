@@ -65,7 +65,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 250px;      /* large, spans most of check */
       letter-spacing: 0.12em;
-      color: blue;
+      color: red;
       opacity: 0.12;         /* light so it doesn't overpower text */
       pointer-events: none;
       display: none;
@@ -97,7 +97,7 @@
       font-size: 10px;
       position: absolute;   /* take it out of the flex flow */
       top: 0.05in;          /* vertical placement */
-      right: 1.435in;        /* horizontal placement – adjust this */
+      right: 1.435in;       /* horizontal placement – adjust this */
       text-align: right;
     }
 
@@ -134,7 +134,6 @@
       flex: 1;
       padding-bottom: 0.03in;
       font-size: 18px;
-
     }
 
     .amount-block-inline {
@@ -156,21 +155,35 @@
     .amount-words-row {
       margin-top: 0.15in;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 0.08in;
       position: relative;
       z-index: 2;
     }
 
+    /* now a flex row with text + swoosh */
     .amount-words-line {
-      border-bottom: 1px solid #000;
+      display: flex;
+      align-items: center;
       flex: 1;
-      padding-bottom: 0.03in;
     }
 
     .amount-words-text {
       font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
       font-size: 11px;
+      white-space: nowrap;
+      margin-right: 0.06in;   /* small gap before swoosh */
+    }
+
+    .amount-words-swoosh {
+      flex: 1;
+      min-width: 0;
+      height: 0.12in;         /* tweak to taste */
+    }
+
+    .amount-words-swoosh svg {
+      width: 100%;
+      height: 100%;
     }
 
     /* ===== BANK LOGO ROW ===== */
@@ -341,6 +354,15 @@
         <div>***</div>
         <div class="amount-words-line">
           <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
+          <div class="amount-words-swoosh">
+            <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+              <path d="M0,7 Q 50,0 100,7"
+                    fill="none"
+                    stroke="#000"
+                    stroke-width="1.2"
+                    stroke-linecap="round" />
+            </svg>
+          </div>
         </div>
         <div>Dollars</div>
       </div>
@@ -424,7 +446,7 @@
         result += tens[Math.floor(n / 10)];
         n = n % 10;
         if (n > 0) result += '-' + ones[n];
-      } else if (n > 0) {
+      } else if (n>0) {
         result += ones[n];
       }
 
@@ -474,7 +496,8 @@
       var words = numberToWordsDollars(dollars);
       var centsStr = String(cents).padStart(2, '0');
 
-      return words + ' & ' + centsStr + '/100 ----------------';
+      // no more dashed tail; swoosh handles the fill
+      return words + ' & ' + centsStr + '/100';
     }
 
     // --- Bank table cache (by Account_Name text) ---
