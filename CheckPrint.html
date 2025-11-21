@@ -205,25 +205,30 @@
       gap: 0.05in;
     }
 
-    .bank-logo {
-      width: 2.4in;
-      height: 0.65in;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      text-align: center;
-      overflow: hidden;
-      position: relative;
-    }
+/* Master logo scale — change this ONE number */
+:root {
+  --logo-scale: 1.0;    /* try 0.8, 1.2, 1.5, etc */
+}
 
-    .bank-logo img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: none;
-    }
+.bank-logo {
+  width: calc(2.4in * var(--logo-scale));
+  height: calc(0.65in * var(--logo-scale));
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(9px * var(--logo-scale));
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.bank-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;  /* maintains perfect aspect ratio */
+}
+
 
     .bank-logo.has-logo #bank-logo-text {
       display: none;
