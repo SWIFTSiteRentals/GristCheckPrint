@@ -3,43 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <title>Check Print Preview</title>
-  <style>
 
+  <style>
     /* ===== CUSTOM FONTS ===== */
     @font-face {
       font-family: 'Norwester';
       src: url('Norwester.woff2') format('woff2');
     }
-
     @font-face {
       font-family: 'Open Sans';
       src: url('OpenSans-Regular.woff2') format('woff2');
     }
-
     @font-face {
       font-family: 'Lacquer';
       src: url('Lacquer-Regular.woff2') format('woff2');
     }
-
     @font-face {
       font-family: 'MICR';
       src: url('MICREncoding.woff2') format('woff2');
     }
-
 
     /* ===== PAGE SETUP ===== */
     @page {
       size: 8.5in 11in;
       margin: 0;
     }
-
     body {
       margin: 0;
       padding: 0;
       font-family: 'Open Sans', Arial, sans-serif;
       font-size: 10.5px;
     }
-
     .page {
       width: 8.5in;
       height: 11in;
@@ -47,16 +41,14 @@
       box-sizing: border-box;
     }
 
-
     /* ===== CHECK AREA (EXACT 3.50") ===== */
     .check-area {
       width: 100%;
-      height: 3.50in;                 /* exact top-check height */
-      padding: 0.18in 0.25in 0.10in;  /* top padding avoids unprintable zone */
+      height: 3.50in;
+      padding: 0.18in 0.25in 0.10in;
       box-sizing: border-box;
       position: relative;
     }
-
 
     /* ===== TOP HEADER ===== */
     .top-row {
@@ -64,36 +56,30 @@
       justify-content: space-between;
       align-items: flex-start;
     }
-
     .account-block {
       max-width: 55%;
       line-height: 1.15;
     }
-
     .account-name {
-      font-family: 'Norwester', 'Open Sans', Arial, sans-serif;
+      font-family: 'Norwester';
       font-size: 12px;
       letter-spacing: 0.03em;
     }
-
     .date-block {
-      font-size: 10px;
       margin-top: 0.05in;
+      font-size: 10px;
     }
-
     .date-line {
       display: inline-block;
       min-width: 1.1in;
       border-bottom: 1px solid #000;
       margin-left: 0.10in;
     }
-
     .check-number-block {
       font-size: 12px;
       font-weight: bold;
       margin-top: 0.05in;
     }
-
 
     /* ===== PAYEE ROW ===== */
     .payee-row {
@@ -102,24 +88,20 @@
       align-items: baseline;
       gap: 0.10in;
     }
-
     .payee-label {
       white-space: nowrap;
     }
-
     .payee-line {
       border-bottom: 1px solid #000;
       flex: 1;
       padding-bottom: 0.03in;
     }
-
     .amount-block-inline {
       display: flex;
       align-items: center;
       gap: 0.05in;
       white-space: nowrap;
     }
-
     .amount-box {
       border: 1px solid #000;
       padding: 0.04in 0.10in;
@@ -128,7 +110,6 @@
       font-size: 11px;
     }
 
-
     /* ===== AMOUNT IN WORDS ===== */
     .amount-words-row {
       margin-top: 0.15in;
@@ -136,154 +117,120 @@
       align-items: baseline;
       gap: 0.08in;
     }
-
     .amount-words-line {
       border-bottom: 1px solid #000;
       flex: 1;
       padding-bottom: 0.03in;
     }
-
     .amount-words-text {
-      font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
+      font-family: 'Lacquer';
       font-size: 11px;
     }
 
-
-    /* ===== BANK LOGO ROW ===== */
+    /* ===== BANK LOGO ===== */
     .bank-row {
       margin-top: 0.18in;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
     }
-
-    .bank-logo-block {
-      display: flex;
-      flex-direction: column;
-      gap: 0.05in;
-    }
-
     .bank-logo {
       width: 2.4in;
       height: 0.65in;
-      border: 1px solid #ccc; /* placeholder frame */
+      border: 1px solid #ccc;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 9px;
-      text-align: center;
     }
 
-
-    /* ===== MEMO + SIGNATURE AREA ===== */
+    /* ===== MEMO + SIGNATURE ===== */
     .bottom-row {
       margin-top: 0.22in;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      font-size: 10px;
     }
-
     .memo-container {
       display: flex;
-      align-items: baseline;
       gap: 0.10in;
-      margin-bottom: 0.05in;       /* lifts memo slightly above signature */
+      margin-bottom: 0.05in;
     }
-
     .memo-line {
       border-bottom: 1px solid #000;
       width: 2.6in;
+      height: 0.18in;
       position: relative;
-      height: 0.18in;        /* fixed height so nothing moves */
     }
-    
     #field-memo {
       position: absolute;
+      bottom: 0.02in;
       left: 0;
-      bottom: 0.02in;        /* tweak until it sits nicely on the baseline */
       font-size: 10px;
     }
-
-
     .signature-container {
-      margin-right: 0.50in;        /* shift line left so right end under amount center */
+      margin-right: 0.50in;
     }
-
     .signature-line {
       border-bottom: 1px solid #000;
-      margin-top: 0.10in;
       width: 2.5in;
+      margin-top: 0.10in;
     }
 
-
-    /* ===== MICR LINE (E-13B) ===== */
+    /* ===== MICR LINE ===== */
     .micr-line {
       position: absolute;
       bottom: 0.12in;
       left: 0.30in;
       right: 0.30in;
-      font-family: 'MICR', monospace;
+      font-family: 'MICR';
       font-size: 12px;
       letter-spacing: 0.08em;
-      text-align: left;
     }
-
   </style>
+
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 </head>
+
 <body>
   <div class="page">
-
-    <!-- ================= CHECK AREA ================= -->
     <div class="check-area">
 
       <!-- TOP HEADER -->
       <div class="top-row">
         <div class="account-block">
-          <div class="account-name" id="field-accountname">{{AccountHolderName}}</div>
-          <div id="field-addr1">{{StreetAddressLine1}}</div>
-          <div id="field-addr2">{{StreetAddressLine2}}</div>
-          <div id="field-citystatezip">{{City}}, {{State}} {{Zip}}</div>
+          <div class="account-name" id="field-accountname"></div>
+          <div id="field-addr1"></div>
+          <div id="field-addr2"></div>
+          <div id="field-citystatezip"></div>
         </div>
 
         <div class="date-block">
-          Date: <span class="date-line" id="field-checkdate">{{CheckDate}}</span>
+          Date: <span class="date-line" id="field-checkdate"></span>
         </div>
 
-        <div class="check-number-block" id="field-checknum">
-          {{CheckNumber}}
-        </div>
+        <div class="check-number-block" id="field-checknum"></div>
       </div>
 
-
-      <!-- PAYEE ROW -->
+      <!-- PAYEE -->
       <div class="payee-row">
         <div class="payee-label">Pay to the<br>Order of</div>
-        <div class="payee-line" id="field-payto">{{PayTo}}</div>
+        <div class="payee-line" id="field-payto"></div>
         <div class="amount-block-inline">
-          $ <div class="amount-box" id="field-amount">{{Amount}}</div>
+          $ <div class="amount-box" id="field-amount"></div>
         </div>
       </div>
-
 
       <!-- AMOUNT IN WORDS -->
       <div class="amount-words-row">
         <div>***</div>
         <div class="amount-words-line">
-          <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
+          <span class="amount-words-text" id="field-amountwords"></span>
         </div>
         <div>Dollars</div>
       </div>
 
-
       <!-- BANK LOGO -->
       <div class="bank-row">
-        <div class="bank-logo-block">
-          <div class="bank-logo" id="field-banklogo">{{BankName}} LOGO</div>
-        </div>
+        <div class="bank-logo" id="field-banklogo"></div>
       </div>
-
 
       <!-- MEMO + SIGNATURE -->
       <div class="bottom-row">
@@ -294,145 +241,123 @@
           </div>
         </div>
 
-
         <div class="signature-container">
           <div class="signature-line"></div>
         </div>
       </div>
 
-
       <!-- MICR -->
-      <div class="micr-line" id="field-micr">
-        {{MicrLine}}
-      </div>
+      <div class="micr-line" id="field-micr"></div>
 
     </div>
-
   </div>
 
+  <!-- ============ SCRIPT ============ -->
   <script>
-    // Listen for selected row from Grist and populate fields
     grist.ready();
 
     function setText(id, value) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      if (value == null) {
-        el.textContent = '';
-      } else {
-        el.textContent = String(value);
-      }
+      const el = document.getElementById(id);
+      if (el) el.textContent = value == null ? '' : String(value);
     }
 
     function formatAmount(value) {
-  if (value == null || value === '') return '';
-  var num = Number(value);
-  if (isNaN(num)) return String(value);   // fall back if it isn't a number
-  return num.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
+      if (value == null || value === '') return '';
+      const num = Number(value);
+      if (isNaN(num)) return String(value);
+      return num.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
 
+    function numberToWordsUnder1000(n) {
+      const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six',
+        'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve',
+        'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+        'Seventeen', 'Eighteen', 'Nineteen'
+      ];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty',
+        'Sixty', 'Seventy', 'Eighty', 'Ninety'
+      ];
 
+      let str = '';
 
-function numberToWordsUnder1000(n) {
-  var ones = [
-    '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six',
-    'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve',
-    'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
-    'Seventeen', 'Eighteen', 'Nineteen'
-  ];
-  var tens = [
-    '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty',
-    'Sixty', 'Seventy', 'Eighty', 'Ninety'
-  ];
+      if (n >= 100) {
+        str += ones[Math.floor(n / 100)] + ' Hundred';
+        n %= 100;
+        if (n > 0) str += ' ';
+      }
 
-  var result = '';
+      if (n >= 20) {
+        str += tens[Math.floor(n / 10)];
+        n %= 10;
+        if (n > 0) str += '-' + ones[n];
+      } else if (n > 0) {
+        str += ones[n];
+      }
 
-  if (n >= 100) {
-    result += ones[Math.floor(n / 100)] + ' Hundred';
-    n = n % 100;
-    if (n > 0) result += ' ';
-  }
-  if (n >= 20) {
-    result += tens[Math.floor(n / 10)];
-    n = n % 10;
-    if (n > 0) result += '-' + ones[n];
-  } else if (n > 0) {
-    result += ones[n];
-  }
+      return str || 'Zero';
+    }
 
-  return result || 'Zero';
-}
+    function numberToWordsDollars(n) {
+      if (n === 0) return 'Zero';
 
-function numberToWordsDollars(n) {
-  if (n === 0) return 'Zero';
-  if (!Number.isFinite(n) || n < 0) return String(n);
+      let parts = [];
 
-  var parts = [];
+      const billions = Math.floor(n / 1_000_000_000);
+      if (billions) {
+        parts.push(numberToWordsUnder1000(billions) + ' Billion');
+        n %= 1_000_000_000;
+      }
 
-  var billions = Math.floor(n / 1_000_000_000);
-  if (billions) {
-    parts.push(numberToWordsUnder1000(billions) + ' Billion');
-    n = n % 1_000_000_000;
-  }
+      const millions = Math.floor(n / 1_000_000);
+      if (millions) {
+        parts.push(numberToWordsUnder1000(millions) + ' Million');
+        n %= 1_000_000;
+      }
 
-  var millions = Math.floor(n / 1_000_000);
-  if (millions) {
-    parts.push(numberToWordsUnder1000(millions) + ' Million');
-    n = n % 1_000_000;
-  }
+      const thousands = Math.floor(n / 1000);
+      if (thousands) {
+        parts.push(numberToWordsUnder1000(thousands) + ' Thousand');
+        n %= 1000;
+      }
 
-  var thousands = Math.floor(n / 1_000);
-  if (thousands) {
-    parts.push(numberToWordsUnder1000(thousands) + ' Thousand');
-    n = n % 1_000;
-  }
+      if (n > 0) {
+        parts.push(numberToWordsUnder1000(n));
+      }
 
-  if (n) {
-    parts.push(numberToWordsUnder1000(n));
-  }
+      return parts.join(' ');
+    }
 
-  return parts.join(' ');
-}
+    function formatAmountInWords(value) {
+      if (value == null || value === '') return '';
+      const num = Number(value);
+      if (isNaN(num)) return String(value);
 
-function formatAmountInWords(value) {
-  if (value == null || value === '') return '';
-  var num = Number(value);
-  if (isNaN(num)) return String(value);
+      const centsTotal = Math.round(num * 100);
+      const dollars = Math.floor(centsTotal / 100);
+      const cents = String(centsTotal % 100).padStart(2, '0');
 
-  // Work in cents to avoid float weirdness
-  var centsTotal = Math.round(num * 100);
-  var dollars   = Math.floor(centsTotal / 100);
-  var cents     = centsTotal % 100;
+      const words = numberToWordsDollars(dollars);
+      return words + ' & ' + cents + '/100 ----------------';
+    }
 
-  var words = numberToWordsDollars(dollars);
-  var centsStr = String(cents).padStart(2, '0');
-
-  // Your preferred style: “One Thousand & 00/100 ----------------”
-  return words + ' & ' + centsStr + '/100 ----------------';
-}
-
-  
-    
     grist.onRecord(function(record) {
       if (!record) return;
-      console.log('Selected row:', record);
 
-      // These property names match what you saw in the console
-      setText('field-payto',   record.Pay_To);
-      setText('field-amount',  formatAmount(record.Amount));
+      setText('field-payto', record.Pay_To);
+      setText('field-amount', formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
       setText('field-checkdate', record.Check_Date);
-      setText('field-memo',    record.Memo);
+      setText('field-memo', record.Memo);
       setText('field-amountwords', formatAmountInWords(record.Amount));
-
-      // MICR column is optional; name it MicrLine or Micr_Line in Grist
       setText('field-micr', record.MicrLine || record.Micr_Line || '');
 
-      
+      // === BANK ACCOUNT INFO (from Linked Bank row, if expanded later) ===
+      // Placeholder for future when we retrieve linked bank fields
     });
   </script>
+
 </body>
 </html>
