@@ -56,21 +56,20 @@
 
     /* ===== VOID WATERMARK ===== */
     .void-watermark {
-    position: absolute;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-10deg);
-    font-family: 'Norwester', Arial, sans-serif;
-    font-size: 250px;      /* larger, spans almost full width */
-    letter-spacing: 0.12em;
-    color: blue;
-    opacity: 0.12;         /* slightly lighter so it doesn’t overpower text */
-    pointer-events: none;
-    display: none;
-    z-index: 1;
-    white-space: nowrap;
-  }
-
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-10deg);
+      font-family: 'Norwester', Arial, sans-serif;
+      font-size: 250px;      /* large, spans most of check */
+      letter-spacing: 0.12em;
+      color: red;
+      opacity: 0.12;         /* light so it doesn't overpower text */
+      pointer-events: none;
+      display: none;
+      z-index: 1;
+      white-space: nowrap;
+    }
 
     /* ===== TOP HEADER ===== */
     .top-row {
@@ -481,7 +480,7 @@
       try {
         var table = await grist.docApi.fetchTable('CheckAccountData');
         var cols = table;
-        var ids = cols.id || cols.ID || cols.Id;
+        var ids = cols.id;
         if (!ids) return;
 
         for (var i = 0; i < ids.length; i++) {
@@ -496,7 +495,7 @@
             Zip: cols.Zip ? cols.Zip[i] : null,
             Bank_Name: cols.Bank_Name ? cols.Bank_Name[i] : null,
             Bank_Logo: cols.Bank_Logo ? cols.Bank_Logo[i] : null,
-            Bank_Logo_URL: cols.Bank_Logo_URL ? cols.Bank_Logo_URL[i] : null,
+            Logo_URL: cols.Logo_URL ? cols.Logo_URL[i] : null,
             Routing_Number: cols.Routing_Number ? cols.Routing_Number[i] : null,
             Account_Number: cols.Account_Number ? cols.Account_Number[i] : null
           };
@@ -608,22 +607,20 @@
         logoText.textContent = bankName ? (bankName + ' LOGO') : 'BANK LOGO';
       }
 
-      // Bank logo from attachment (handles array or single id)
       // Bank logo via URL column (Logo_URL)
-if (logoWrapper && logoImg) {
-  var logoUrl = (bankRow.Logo_URL || '').toString().trim();
+      if (logoWrapper && logoImg) {
+        var logoUrl = (bankRow.Logo_URL || '').toString().trim();
 
-  if (logoUrl) {
-    logoImg.src = logoUrl;
-    logoImg.style.display = 'block';
-    logoWrapper.classList.add('has-logo');
-  } else {
-    logoImg.src = '';
-    logoImg.style.display = 'none';
-    logoWrapper.classList.remove('has-logo');
-  }
-}
-
+        if (logoUrl) {
+          logoImg.src = logoUrl;
+          logoImg.style.display = 'block';
+          logoWrapper.classList.add('has-logo');
+        } else {
+          logoImg.src = '';
+          logoImg.style.display = 'none';
+          logoWrapper.classList.remove('has-logo');
+        }
+      }
 
       // MICR line
       var micr = record.MicrLine || record.Micr_Line;
