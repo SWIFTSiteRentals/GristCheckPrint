@@ -467,43 +467,52 @@
       return words + ' & ' + centsStr + '/100 ----------------';
     }
 
-    // --- Bank table cache (tight to your schema) ---
-    var bankById = null;   // { rowId: { ...row } }
+// --- Bank table cache ---
+var bankById = null;            // { rowId: row }
+var bankByAccountName = null;   // { "SWIFT Checking": row }
 
-    async function ensureBankCache() {
-      if (bankById) return;
+async function ensureBankCache() {
+  if (bankById && bankByAccountName) return;
 
-      try {
-        var table = await grist.docApi.fetchTable('CheckAccountData');  // exact table name
-        var cols = table;
-        var ids = cols.id;  // Grist primary key column is "id"
+  bankById = {};
+  bankByAccountName = {};
 
-        bankById = {};
+  try {
+    var table = await grist.docApi.fetchTable('CheckAccountData');
+    var cols = table;
+    var ids = cols.id;   // primary key
 
-        for (var i = 0; i < ids.length; i++) {
-          var rowId = ids[i];
-          var row = {
-            // tight mapping to your actual column IDs
-            id: rowId,
-            Account_Name: cols.Account_Name ? cols.Account_Name[i] : null,
-            Account_Holder_Name: cols.Account_Holder_Name ? cols.Account_Holder_Name[i] : null,
-            Street_Address_Line_1: cols.Street_Address_Line_1 ? cols.Street_Address_Line_1[i] : null,
-            Street_Address_Line_2: cols.Street_Address_Line_2 ? cols.Street_Address_Line_2[i] : null,
-            City: cols.City ? cols.City[i] : null,
-            State: cols.State ? cols.State[i] : null,
-            Zip: cols.Zip ? cols.Zip[i] : null,
-            Bank_Name: cols.Bank_Name ? cols.Bank_Name[i] : null,
-            Bank_Logo: cols.Bank_Logo ? cols.Bank_Logo[i] : null,
-            Routing_Number: cols.Routing_Number ? cols.Routing_Number[i] : null,
-            Account_Number: cols.Account_Number ? cols.Account_Number[i] : null
-          };
-          bankById[rowId] = row;
-        }
-      } catch (e) {
-        console.error('Error loading CheckAccountData table', e);
-        bankById = {};  // prevent repeated failing calls
+    for (var i = 0; i < ids.length; i++) {
+      var rowId = ids[i];
+      var row = {
+        id: rowId,
+        Account_Name: cols.Account_Name ? cols.Account_Name[i] : null,
+        Account_Holder_Name: cols.Account_Holder_Name ? cols.Account_Holder_Name[i] : null,
+        Street_Address_Line_1: cols.Street_Address_Line_1 ? cols.Street_Address_Line_1[i] : null,
+        Street_Address_Line_2: cols.Street_Address_Line_2 ? cols.Street_Address_Line_2[i] : null,
+        City: cols.City ? cols.City[i] : null,
+        State: cols.State ? cols.State[i] : null,
+        Zip: cols.Zip ? cols.Zip[i] : null,
+        Bank_Name: cols.Bank_Name ? cols.Bank_Name[i] : null,
+        Bank_Logo: cols.Bank_Logo ? cols.Bank_Logo[i] : null,
+        Routing_Number: cols.Routing_Number ? cols.Routing_Number[i] : null,
+        Account_Number: cols.Account_Number ? cols.Account_Number[i] : null
+      };
+
+      bankById[rowId] = row;
+
+      var acctName = row.Account_Name;
+      if (acctName) {
+        bankByAccountName[acctName.toString()] = row;
       }
     }
+  } catch (e) {
+    console.error('Error loading CheckAccountData table', e);
+    bankById = {};
+    bankByAccountName = {};
+  }
+}
+
 
     function buildCityStateZip(row) {
       var city = row.City || '';
@@ -564,9 +573,17 @@
       }
 
       // Look up bank row by reference id (tight assumption: Bank is a Ref to CheckAccountData)
-      await ensureBankCache();
-      var bankRow = bankById ? bankById[record.Bank] : null;
-      console.log('Resolved bankRow:', bankRow);
+await ensureBankCache();
+
+// Bank in CheckRegister is linked to Account_Name text, e.g. "SWIFT Checking"
+var bankRow = null;
+if (record.Bank != null && bankByAccountName) {
+  var key = record.Bank.toString();
+  bankRow = bankByAccountName[key] || null;
+}
+
+console.log('Bank cell from record:', record.Bank, 'Resolved bankRow:', bankRow);
+
 
       if (!bankRow) {
         return;
