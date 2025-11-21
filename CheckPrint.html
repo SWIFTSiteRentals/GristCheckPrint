@@ -151,29 +151,34 @@
       font-size: 11px;
     }
 
-    /* ===== AMOUNT IN WORDS ===== */
-    .amount-words-row {
-      margin-top: 0.15in;
-      display: flex;
-      align-items: center;
-      gap: 0.08in;
-      position: relative;
-      z-index: 2;
-    }
+.amount-words-line {
+  position: relative;      /* IMPORTANT */
+  flex: 1;
+  padding-bottom: 0.03in;
+  /* REMOVE the original border-bottom here */
+}
 
-    /* now a flex row with text + swoosh */
-    .amount-words-line {
-      display: flex;
-      align-items: center;
-      flex: 1;
-    }
+/* Straight underline */
+.amount-words-underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;              /* sits at the bottom edge */
+  border-bottom: 1px solid #000;
+  height: 0;
+}
 
-    .amount-words-text {
-      font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
-      font-size: 11px;
-      white-space: nowrap;
-      margin-right: 0.06in;   /* small gap before swoosh */
-    }
+/* Swoosh overlay */
+.amount-words-swoosh {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;            /* adjust if needed */
+  height: 0.18in;          /* adjust swoosh height */
+  pointer-events: none;
+  overflow: visible;
+}
+
 
     .amount-words-swoosh {
       flex: 1;
@@ -349,23 +354,31 @@
         </div>
       </div>
 
-      <!-- AMOUNT IN WORDS -->
-      <div class="amount-words-row">
-        <div>***</div>
-        <div class="amount-words-line">
-          <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
-          <div class="amount-words-swoosh">
-            <svg viewBox="0 0 100 10" preserveAspectRatio="none">
-              <path d="M0,7 Q 50,0 100,7"
-                    fill="none"
-                    stroke="#000"
-                    stroke-width="1.2"
-                    stroke-linecap="round" />
-            </svg>
-          </div>
-        </div>
-        <div>Dollars</div>
-      </div>
+<!-- AMOUNT IN WORDS -->
+<div class="amount-words-row">
+  <div>***</div>
+
+  <div class="amount-words-line">
+    <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
+
+    <!-- Real underline -->
+    <div class="amount-words-underline"></div>
+
+    <!-- Swoosh -->
+    <div class="amount-words-swoosh">
+      <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+        <path d="M0,7 Q 50,0 100,7"
+              fill="none"
+              stroke="#000"
+              stroke-width="1.2"
+              stroke-linecap="round" />
+      </svg>
+    </div>
+  </div>
+
+  <div>Dollars</div>
+</div>
+
 
       <!-- BANK LOGO -->
       <div class="bank-row">
