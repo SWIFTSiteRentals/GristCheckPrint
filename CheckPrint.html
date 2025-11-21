@@ -61,10 +61,10 @@
       left: 50%;
       transform: translate(-50%, -50%) rotate(-10deg);
       font-family: 'Norwester', Arial, sans-serif;
-      font-size: 250px;      /* large, spans most of check */
+      font-size: 250px;
       letter-spacing: 0.12em;
       color: blue;
-      opacity: 0.12;         /* light so it doesn't overpower text */
+      opacity: 0.12;
       pointer-events: none;
       display: none;
       z-index: 1;
@@ -93,15 +93,35 @@
     
     .date-block {
       font-size: 10px;
-      position: absolute;   /* take it out of the flex flow */
-      top: 0.05in;          /* vertical placement */
-      right: 1.435in;       /* horizontal placement – adjust this */
+      position: absolute;
+      top: 0.05in;
+      right: 1.435in;
+      text-align: center;
+      width: 1.2in;
+    }
+
+    .date-value {
+      display: inline-block;
+      margin-bottom: 0.02in;
+    }
+
+    .date-underline {
+      border-bottom: 1px solid #000;
+      width: 100%;
+      margin: 0 auto;
+      height: 0.02in;
+    }
+
+    .date-label {
+      font-size: 9px;
+      letter-spacing: 0.03em;
+      margin-top: 0.01in;
       text-align: right;
     }
 
     .date-line {
       display: inline-block;
-      min-width: 1.1in;
+      min-width: 0.5in;
       border-bottom: 1px solid #000;
       margin-left: 0.10in;
     }
@@ -120,19 +140,35 @@
       gap: 0.10in;
       position: relative;
       z-index: 2;
+      font-size: 8px;
     }
 
     .payee-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: .5in;
+    }
+
+    .payee-label-inner {
+      text-align: center;
+      line-height: 1.1;
       white-space: nowrap;
-      margin-top: -0.0in;   /* raise the label */
     }
 
     .payee-line {
-      border-bottom: 1px solid #000;
-      flex: 1;
-      padding-bottom: 0.03in;
-      font-size: 18px;
+    border-bottom: 1px solid #000;
+    border-right: 1px solid #000;   /* vertical line at end of payee line */
+    flex: 1;
+    padding-bottom: 0.03in;
+    font-size: 18px;
+    padding-right: 0.03in;
+
+    /* pull the line left under "PAY TO THE ORDER OF" */
+    margin-left: -0.60in;   /* = .5in label width + 0.10in gap */
+    padding-left: 0.60in;   /* push the {{PayTo}} text back to where it was */
     }
+    
 
     .amount-block-inline {
       display: flex;
@@ -141,53 +177,62 @@
       white-space: nowrap;
     }
 
+    .amount-dollar {
+      font-size: 16px;      /* larger dollar sign */
+/*      font-weight: bold; */
+      line-height: 1;
+      margin-top: -0.02in;  /* tiny lift to center visually */
+    }
+
     .amount-box {
-      border: 1px solid #000;
-      padding: 0.04in 0.10in;
+      border: 2px solid #000;
+      padding: 0.06in 0.10in;
       min-width: 1.0in;
       text-align: right;
       font-size: 11px;
     }
 
     /* ===== AMOUNT IN WORDS ===== */
-    .amount-words-row {
-      margin-top: 0.15in;
-      display: flex;
-      align-items: baseline;
-      gap: 0.08in;
-      position: relative;
-      z-index: 2;
-    }
+.amount-words-row {
+  margin-top: 0.15in;
+  display: flex;
+  align-items: baseline;
+  gap: 0.08in;
+  position: relative;
+  z-index: 2;
+}
 
-    .amount-words-line {
-      flex: 1;
-      border-bottom: 1px solid #000;   /* full underline */
-      padding-bottom: 0.03in;
-      display: flex;
-      align-items: flex-end;
-      position: relative;
-      min-height: 0.16in;
-    }
+.amount-words-line {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  padding-bottom: 0.03in;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  min-height: 0.16in;
+  /* no margin-left / padding-left here */
+}
 
-    .amount-words-text {
-      font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
-      font-size: 11px;
-      white-space: nowrap;
-      padding-right: 0.06in;           /* small gap before swoosh */
-      z-index: 1;                      /* stay above the line graphics */
-    }
+.amount-words-text {
+  font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
+  font-size: 11px;
+  white-space: nowrap;
+  padding-right: 0.06in;
+  z-index: 1;
+}
 
-    .amount-words-filler {
-      flex: 1;
-      height: 0.14in;                  /* height available for the swoosh */
-      display: block;
-    }
+.amount-words-filler {
+  flex: 1;
+  height: 0.14in;
+  display: block;
+}
 
-    .amount-words-filler svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
+.amount-words-filler svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
 
     /* ===== BANK LOGO ROW ===== */
     .bank-row {
@@ -205,81 +250,94 @@
       gap: 0.05in;
     }
 
-/* Master logo scale — change this ONE number */
-:root {
-  --logo-scale: 0.8;    /* try 0.8, 1.2, 1.5, etc */
-}
+    /* Master logo scale — change this ONE number */
+    :root {
+      --logo-scale: 0.8;
+    }
 
-.bank-logo {
-  width: calc(2.4in * var(--logo-scale));
-  height: calc(0.65in * var(--logo-scale));
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateX(0.175in);
-  font-size: calc(9px * var(--logo-scale));
-  text-align: center;
-  overflow: hidden;
-  position: relative;
-}
+    .bank-logo {
+      width: calc(2.4in * var(--logo-scale));
+      height: calc(0.65in * var(--logo-scale));
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(0.175in);
+      font-size: calc(9px * var(--logo-scale));
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
 
-.bank-logo img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;  /* maintains perfect aspect ratio */
-}
-
+    .bank-logo img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
 
     .bank-logo.has-logo #bank-logo-text {
       display: none;
     }
 
-    /* ===== MEMO + SIGNATURE AREA ===== */
-    .bottom-row {
-      margin-top: 0.22in;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      font-size: 10px;
-      position: relative;
-      z-index: 2;
-    }
+/* ===== MEMO + SIGNATURE AREA ===== */
+.bottom-row {
+  margin-top: 0.22in;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;   /* align the tops */
+  font-size: 10px;
+  position: relative;
+  z-index: 2;
+}
 
-    .memo-container {
-      display: flex;
-      align-items: baseline;
-      gap: 0.10in;
-      margin-bottom: 0.05in;
-    }
+/* MEMO LEFT SIDE */
+.memo-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 3.0in;
+}
 
-    .memo-line {
-      border-bottom: 1px solid #000;
-      width: 2.6in;
-      position: relative;
-      height: 0.18in;
-    }
+.memo-line {
+  position: relative;
+  border-bottom: 1px solid #000;
+  width: 100%;
+  height: 0.18in;            /* matches signature height */
+  
+}
 
-    #field-memo {
-      position: absolute;
-      left: 0;
-      bottom: 0.02in;
-      font-size: 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      right: 0;
-    }
+#field-memo {
+  position: absolute;
+  left: 0;
+  bottom: 0.02in;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  right: 0;
+}
 
-    .signature-container {
-      margin-right: 0.50in;
-    }
+.memo-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 0.01in;
+  width: 100%;
+  text-align: right;         /* same behavior as DATE label */
+}
 
-    .signature-line {
-      border-bottom: 1px solid #000;
-      margin-top: 0.10in;
-      width: 2.5in;
-    }
+/* SIGNATURE RIGHT SIDE */
+.signature-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.signature-line {
+  border-bottom: 1px solid #000;
+  width: 3.5in;
+  height: 0.18in;            /* matches memo line for alignment */
+  margin-left: 0.25in;
+}
 
     /* ===== MICR LINE (E-13B) ===== */
     .micr-line {
@@ -341,7 +399,9 @@
         </div>
 
         <div class="date-block">
-          Date: <span class="date-line" id="field-checkdate">{{CheckDate}}</span>
+          <span class="date-value" id="field-checkdate">{{CheckDate}}</span>
+          <div class="date-underline"></div>
+          <div class="date-label">DATE</div>
         </div>
 
         <div class="check-number-block" id="field-checknum">
@@ -351,35 +411,39 @@
 
       <!-- PAYEE ROW -->
       <div class="payee-row">
-        <div class="payee-label">Pay to the<br>Order of</div>
+        <div class="payee-label">
+          <div class="payee-label-inner">
+            PAY TO THE<br>ORDER OF
+          </div>
+        </div>
         <div class="payee-line" id="field-payto">{{PayTo}}</div>
         <div class="amount-block-inline">
-          $ <div class="amount-box" id="field-amount">{{Amount}}</div>
+          <span class="amount-dollar">$</span>
+          <div class="amount-box" id="field-amount">{{Amount}}</div>
         </div>
       </div>
 
-      <!-- AMOUNT IN WORDS -->
-      <div class="amount-words-row">
-        <div>***</div>
+    <!-- AMOUNT IN WORDS -->
+    <div class="amount-words-row">
 
-        <div class="amount-words-line">
-          <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
+    <div class="amount-words-line">
+        <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
 
-          <!-- filler area with swoosh only in the blank part -->
-          <span class="amount-words-filler">
-            <svg viewBox="0 0 100 10" preserveAspectRatio="none">
-              <!-- tweak these numbers if you want a different curve -->
-              <path d="M0,7 Q 50,1 100,7"
-                    fill="none"
-                    stroke="#000"
-                    stroke-width="1.2"
-                    stroke-linecap="round" />
-            </svg>
-          </span>
-        </div>
+        <!-- filler area extending the underline -->
+        <span class="amount-words-filler">
+        <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+            <path d="M0,7 Q 50,1 100,7"
+                fill="none"
+                stroke="#000"
+                stroke-width="1.2"
+                stroke-linecap="round" />
+        </svg>
+        </span>
+    </div>
 
-        <div>Dollars</div>
-      </div>
+    <div>Dollars</div>
+    </div>
+
 
       <!-- BANK LOGO -->
       <div class="bank-row">
@@ -391,19 +455,24 @@
         </div>
       </div>
 
-      <!-- MEMO + SIGNATURE -->
-      <div class="bottom-row">
-        <div class="memo-container">
-          <div>Memo:</div>
-          <div class="memo-line">
+        <!-- MEMO + SIGNATURE -->
+        <div class="bottom-row">
+
+        <!-- MEMO LEFT -->
+        <div class="memo-wrapper">
+            <div class="memo-line">
             <span id="field-memo"></span>
-          </div>
+            </div>
+            <div class="memo-label">MEMO</div>
         </div>
 
+        <!-- SIGNATURE RIGHT -->
         <div class="signature-container">
-          <div class="signature-line"></div>
+            <div class="signature-line"></div>
         </div>
-      </div>
+
+        </div>
+
 
       <!-- MICR -->
       <div class="micr-line" id="field-micr">
@@ -510,7 +579,6 @@
       var words = numberToWordsDollars(dollars);
       var centsStr = String(cents).padStart(2, '0');
 
-      // no dashed tail; swoosh handles the fill
       return words + ' & ' + centsStr + '/100';
     }
 
