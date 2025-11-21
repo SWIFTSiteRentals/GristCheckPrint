@@ -57,16 +57,18 @@
     /* ===== VOID WATERMARK ===== */
     .void-watermark {
       position: absolute;
-      top: 50%;
+      top: 52%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(-30deg);
       font-family: 'Norwester', Arial, sans-serif;
-      font-size: 72px;
+      font-size: 150px;      /* bigger, spans most of check */
+      letter-spacing: 0.08em;
       color: red;
-      opacity: 0.15;
+      opacity: 0.14;
       pointer-events: none;
       display: none;
       z-index: 1;
+      white-space: nowrap;
     }
 
     /* ===== TOP HEADER ===== */
@@ -604,17 +606,25 @@
         logoText.textContent = bankName ? (bankName + ' LOGO') : 'BANK LOGO';
       }
 
-      // Bank logo from attachment
+      // Bank logo from attachment (handles array or single id)
       if (logoWrapper && logoImg) {
         var logoCell = bankRow.Bank_Logo;
-        if (Array.isArray(logoCell) && logoCell.length > 0) {
+        var logoIds = [];
+
+        if (Array.isArray(logoCell)) {
+          logoIds = logoCell;
+        } else if (logoCell != null && logoCell !== '') {
+          logoIds = [logoCell];
+        }
+
+        if (logoIds.length > 0) {
           try {
-            var url = await grist.docApi.getAttachmentUrl(logoCell[0]);
+            var url = await grist.docApi.getAttachmentUrl(logoIds[0]);
             logoImg.src = url;
             logoImg.style.display = 'block';
             logoWrapper.classList.add('has-logo');
           } catch (e) {
-            console.error('Error loading bank logo attachment', e);
+            console.error('Error loading bank logo attachment', e, 'logoCell:', logoCell);
             logoImg.src = '';
             logoImg.style.display = 'none';
             logoWrapper.classList.remove('has-logo');
