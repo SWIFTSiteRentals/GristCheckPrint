@@ -608,34 +608,47 @@
       }
 
       // Bank logo from attachment (handles array or single id)
-      if (logoWrapper && logoImg) {
-        var logoCell = bankRow.Bank_Logo;
-        var logoIds = [];
+// Bank logo from attachment (handles array or single id)
+if (logoWrapper && logoImg) {
+  var logoCell = bankRow.Bank_Logo;
+  var logoIds = [];
 
-        if (Array.isArray(logoCell)) {
-          logoIds = logoCell;
-        } else if (logoCell != null && logoCell !== '') {
-          logoIds = [logoCell];
-        }
+  if (Array.isArray(logoCell)) {
+    logoIds = logoCell;
+  } else if (logoCell != null && logoCell !== '') {
+    logoIds = [logoCell];
+  }
 
-        if (logoIds.length > 0) {
-          try {
-            var url = await grist.docApi.getAttachmentUrl(logoIds[0]);
-            logoImg.src = url;
-            logoImg.style.display = 'block';
-            logoWrapper.classList.add('has-logo');
-          } catch (e) {
-            console.error('Error loading bank logo attachment', e, 'logoCell:', logoCell);
-            logoImg.src = '';
-            logoImg.style.display = 'none';
-            logoWrapper.classList.remove('has-logo');
-          }
-        } else {
-          logoImg.src = '';
-          logoImg.style.display = 'none';
-          logoWrapper.classList.remove('has-logo');
-        }
-      }
+  if (logoIds.length > 0) {
+    try {
+      var attId = logoIds[0];
+
+      // fetchAttachment returns a Blob; turn it into an object URL
+      var blob = await grist.docApi.fetchAttachment(attId);
+      var url = URL.createObjectURL(blob);
+
+      logoImg.onload = function () {
+        // free memory after the image loads
+        URL.revokeObjectURL(url);
+        logoImg.onload = null;
+      };
+
+      logoImg.src = url;
+      logoImg.style.display = 'block';
+      logoWrapper.classList.add('has-logo');
+    } catch (e) {
+      console.error('Error loading bank logo attachment', e, 'logoCell:', logoCell);
+      logoImg.src = '';
+      logoImg.style.display = 'none';
+      logoWrapper.classList.remove('has-logo');
+    }
+  } else {
+    logoImg.src = '';
+    logoImg.style.display = 'none';
+    logoWrapper.classList.remove('has-logo');
+  }
+}
+
 
       // MICR line
       var micr = record.MicrLine || record.Micr_Line;
