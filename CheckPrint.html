@@ -4,14 +4,7 @@
   <meta charset="UTF-8" />
   <title>Check Print Preview</title>
   <style>
-    .align-date {
-  width: 2.7in;        /* adjust until the right edge lines up exactly */
-  text-align: right;
-}
-.align-date .date-line {
-  min-width: 1.4in;    /* this controls the underline width */
-  margin-left: 0.10in;
-}
+
 
     /* ===== CUSTOM FONTS ===== */
     @font-face {
@@ -99,10 +92,13 @@
       font-size: 12px;
       letter-spacing: 0.03em;
     }
-
+    
     .date-block {
       font-size: 10px;
-      margin-top: 0.05in;
+      position: absolute;   /* take it out of the flex flow */
+      top: 0.05in;          /* vertical placement */
+      right: 2.10in;        /* horizontal placement – adjust this */
+      text-align: right;
     }
 
     .date-line {
@@ -319,7 +315,7 @@
           <div id="field-citystatezip">{{City}}, {{State}} {{Zip}}</div>
         </div>
 
-        <div class="date-block align-date">
+        <div class="date-block">
           Date: <span class="date-line" id="field-checkdate">{{CheckDate}}</span>
         </div>
 
