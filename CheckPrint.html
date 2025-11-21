@@ -97,7 +97,7 @@
       font-size: 10px;
       position: absolute;   /* take it out of the flex flow */
       top: 0.05in;          /* vertical placement */
-      right: 1.20in;        /* horizontal placement – adjust this */
+      right: 1.435in;        /* horizontal placement – adjust this */
       text-align: right;
     }
 
@@ -118,7 +118,7 @@
     .payee-row {
       margin-top: 0.18in;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 0.10in;
       position: relative;
       z-index: 2;
@@ -126,12 +126,15 @@
 
     .payee-label {
       white-space: nowrap;
+      margin-top: -0.0in;   /* raise the label */
     }
 
     .payee-line {
       border-bottom: 1px solid #000;
       flex: 1;
       padding-bottom: 0.03in;
+      font-size: 18px;
+
     }
 
     .amount-block-inline {
