@@ -63,7 +63,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: dimgray;
+      color: dimgrey;
       opacity: 0.10;
       pointer-events: none;
       display: none;
@@ -340,24 +340,7 @@
       margin-left: 0.25in;
     }
 
-    /* ===== MICR LINE (E-13B) =====
-       Kept for future use / debugging but visually hidden.
-       MICR characters the bank will see are the ones in the 62 boxes. */
-    .micr-line {
-      position: absolute;
-      bottom: 0.19in;          /* ~3/16" from bottom per ANSI */
-      left: 0.55in;
-      right: 0.30in;
-      font-family: 'MICR';
-      font-size: 10pt;         /* adjust to whatever your MICR font vendor specifies */
-      letter-spacing: 0;       /* MICR spacing must not be tracked */
-      text-align: left;
-      z-index: 1;
-      color: transparent;      /* do not print this line; boxes handle actual MICR */
-      pointer-events: none;
-    }
-
-    /* ===== MICR DEBUG BAND & GRID (DEV + ACTUAL MICR CHARS) ===== */
+    /* ===== MICR DEBUG BAND & GRID (ALSO SERVES AS ACTUAL MICR LINE) ===== */
     .micr-debug-band {
       position: absolute;
       bottom: 0;
@@ -365,31 +348,36 @@
       right: 0.25in;
       height: 0.625in;       /* ANSI clear band height */
       box-sizing: border-box;
-      z-index: 2;
-      border: 1px solid rgba(0,0,0,0.6);  /* dev only, hide later for production */
+      z-index: 1;
+      border: 1px solid rgba(0,0,0,0.6);
       border-bottom: none;
       background: rgba(255,255,255,0.6);
     }
 
     .micr-debug-grid {
       position: absolute;
-      bottom: 0.187in;       /* ~3/16" from bottom: start of 0.25" MICR print band */
+      /* MICR character band: baseline ~0.19" above bottom, band ~0.25" high */
+      bottom: 0.19in;
       left: 0;
       right: 0;
-      height: 0.25in;        /* MICR print band height */
+      height: 0.25in;
       display: grid;
-      grid-template-columns: repeat(62, 1fr);  /* positions 62..01 */
+
+      /* 62 boxes, each 1/8" wide in print */
+      grid-template-columns: repeat(62, 0.125in);
+
       border-top: 1px solid rgba(0,0,0,0.7);
       border-bottom: 1px solid rgba(0,0,0,0.7);
     }
 
     .micr-debug-cell {
       border-left: 1px solid rgba(0,0,0,0.6);
-      font-family: 'MICR', monospace;
-      line-height: 0.25in;
-      text-align: center;
+      font-family: 'MICR';
+      font-size: 10pt;          /* typical spec size, adjust if your MICR font doc says otherwise */
+      line-height: 0.25in;      /* fill the band vertically */
+      text-align: right;        /* right-justify inside the box */
+      padding-right: 0.02in;    /* slight inset from the right wall */
       position: relative;
-      font-size: 10pt;       /* match MICR spec size */
     }
 
     .micr-debug-cell:last-child {
@@ -397,8 +385,8 @@
     }
 
     .micr-debug-char {
-      display: block;
-      height: 100%;
+      display: inline-block;
+      width: 100%;
     }
 
     .micr-debug-index {
@@ -485,13 +473,11 @@
           <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
           <span class="amount-words-filler">
             <svg viewBox="0 0 100 10" preserveAspectRatio="none">
-              <path
-                d="M0,7 Q 50,1 100,7"
-                fill="none"
-                stroke="#000"
-                stroke-width="1.2"
-                stroke-linecap="round"
-              />
+              <path d="M0,7 Q 50,1 100,7"
+                    fill="none"
+                    stroke="#000"
+                    stroke-width="1.2"
+                    stroke-linecap="round" />
             </svg>
           </span>
         </div>
@@ -522,10 +508,7 @@
         </div>
       </div>
 
-      <!-- MICR LINE (hidden text, real MICR is in grid cells) -->
-      <div class="micr-line" id="field-micr"></div>
-
-      <!-- MICR DEBUG BAND + GRID (holds the actual MICR characters) -->
+      <!-- MICR DEBUG BAND + GRID (also used as actual MICR line when you hide borders) -->
       <div class="micr-debug-band">
         <div class="micr-debug-grid" id="micr-debug-grid"></div>
       </div>
@@ -631,7 +614,7 @@
     }
 
     /* ===== MICR GRID CREATION + UPDATE ===== */
-    var TOTAL_MICR_BOXES = 62;
+    var TOTAL_MICR_BOXES = 62;  // positions 62 (far left) .. 01 (far right)
 
     function initMicrGrid() {
       var grid = document.getElementById('micr-debug-grid');
@@ -658,31 +641,21 @@
       }
     }
 
-    // micrString is right-aligned; rightmost char goes in box 01.
-    function updateMicrGrid(micrString) {
+    // boxChars is an array indexed 1..62 with characters ('' for blank)
+    function updateMicrGrid(boxChars) {
       var grid = document.getElementById('micr-debug-grid');
       if (!grid) return;
+      if (!boxChars) boxChars = [];
 
-      micrString = (micrString || '').toString();
       var cells = grid.children;
-      var len = micrString.length;
-
-      // clear all first
-      for (var i = 0; i < cells.length; i++) {
-        var span = cells[i].querySelector('.micr-debug-char');
-        if (span) span.textContent = '';
-      }
-
-      // fill from right to left
-      for (var i = 0; i < len && i < TOTAL_MICR_BOXES; i++) {
-        var ch = micrString[len - 1 - i];
-        // box index from right is i (0-based) -> logical position (i+1)
-        // grid is 62..01 left->right, so box 01 is last child
-        var cellIndex = TOTAL_MICR_BOXES - 1 - i;
+      // cells[0] = box 62, cells[61] = box 01
+      for (var pos = TOTAL_MICR_BOXES; pos >= 1; pos--) {
+        var cellIndex = TOTAL_MICR_BOXES - pos;  // 62->0, 61->1, ..., 1->61
         var cell = cells[cellIndex];
         if (!cell) continue;
-        var charSpan = cell.querySelector('.micr-debug-char');
-        if (charSpan) charSpan.textContent = ch;
+        var span = cell.querySelector('.micr-debug-char');
+        if (!span) continue;
+        span.textContent = boxChars[pos] || '';
       }
     }
 
@@ -750,6 +723,71 @@
       return bankByAccountName[key] || null;
     }
 
+    // Build MICR box mapping from routing/account/check numbers per your layout spec.
+    function buildMicrBoxes(routing, account, checkNumber) {
+      var boxes = new Array(TOTAL_MICR_BOXES + 1).fill('');
+
+      // Sanitize to digits only
+      routing = (routing || '').toString().replace(/\D/g, '');
+      account = (account || '').toString().replace(/\D/g, '');
+      checkNumber = (checkNumber || '').toString().replace(/\D/g, '');
+
+      // Ensure routing is at most 9 digits (typical)
+      routing = routing.slice(0, 9);
+
+      // Use last 4 digits of check number, left-padded with zeros
+      checkNumber = checkNumber.slice(-4);
+      checkNumber = checkNumber.padStart(4, '0');
+
+      var TRANSIT = 'A'; // |:
+      var ONUS   = 'C'; // ||*
+
+      // Box 62: leading transit
+      boxes[62] = TRANSIT;
+
+      // Boxes 61..53: routing digits (left-to-right)
+      for (var i = 0; i < routing.length && i < 9; i++) {
+        var boxPos = 61 - i; // 61,60,...,53
+        if (boxPos >= 53) {
+          boxes[boxPos] = routing[i];
+        }
+      }
+
+      // Box 52: trailing transit
+      boxes[52] = TRANSIT;
+
+      // Boxes 51..49: blanks by design
+
+      // Box 48: account start symbol
+      boxes[48] = ONUS;
+
+      // Boxes 47 downward: account digits
+      var pos = 47;
+      for (var j = 0; j < account.length && pos >= 1; j++) {
+        boxes[pos] = account[j];
+        pos--;
+      }
+
+      // Next box: trailing ONUS if we still have room
+      if (pos >= 1) {
+        boxes[pos] = ONUS;
+        pos--;
+      }
+
+      // 3 blank boxes
+      pos -= 3;
+      if (pos < 1) pos = 1;
+
+      // Check number: 4 boxes starting at current pos downwards
+      for (var k = 0; k < checkNumber.length && pos >= 1; k++) {
+        boxes[pos] = checkNumber[k];
+        pos--;
+      }
+
+      // Remaining boxes stay blank
+      return boxes;
+    }
+
     async function updateFromRecord(record) {
       if (!record) return;
       console.log('Selected row:', record);
@@ -777,8 +815,6 @@
         addr2El.textContent = '';
       }
       setText('field-citystatezip', '');
-      // do NOT set field-micr text anymore – we only use boxes
-      updateMicrGrid('');
 
       var logoWrapper = document.getElementById('field-banklogo');
       var logoImg = document.getElementById('bank-logo-img');
@@ -790,9 +826,11 @@
         logoText.textContent = '{{BankName}} LOGO';
       }
 
+      // Default: clear MICR boxes
+      updateMicrGrid(null);
+
       // No bank? stop here
       if (record.Bank == null || record.Bank === '') {
-        updateMicrGrid('');
         return;
       }
 
@@ -801,7 +839,6 @@
       console.log('Resolved bankRow:', bankRow);
 
       if (!bankRow) {
-        updateMicrGrid('');
         return;
       }
 
@@ -843,31 +880,19 @@
         }
       }
 
-      // MICR line string (for the boxes only)
-      var micr = record.MicrLine || record.Micr_Line;
-      if (!micr) {
-        var routing = bankRow.Routing_Number;
-        var account = bankRow.Account_Number;
-        var chk = record.Check_Number;
-        if (routing && account && chk != null && chk !== '') {
-          // A = transit symbol, C = on-us symbol
-          micr = 'A' + routing + 'A ' + account + 'C ' + chk + 'C';
-        }
-      }
+      // Build MICR box mapping using routing/account/check
+      var routing = bankRow.Routing_Number;
+      var account = bankRow.Account_Number;
+      var chk     = record.Check_Number;
 
-      // We no longer print the MICR string as a separate line; only in the boxes
-      updateMicrGrid(micr || '');
+      var boxChars = buildMicrBoxes(routing, account, chk);
+      updateMicrGrid(boxChars);
     }
 
     /* ===== STARTUP ===== */
     document.addEventListener('DOMContentLoaded', function () {
-      // Build empty 62-box grid so it shows even when not in Grist.
-      initMicrGrid();
+      initMicrGrid();          // build empty 62-box grid
 
-      // Optional: show template MICR placeholder locally
-      updateMicrGrid('{{MicrLine}}');
-
-      // Hook Grist if available
       if (window.grist && typeof grist.ready === 'function') {
         grist.ready();
         if (typeof grist.onRecord === 'function') {
