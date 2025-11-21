@@ -193,9 +193,18 @@
 
     .memo-line {
       border-bottom: 1px solid #000;
-      width: 2.6in;                /* shorter memo line */
-      padding-bottom: 0.03in;
+      width: 2.6in;
+      position: relative;
+      height: 0.18in;        /* fixed height so nothing moves */
     }
+    
+    #field-memo {
+      position: absolute;
+      left: 0;
+      bottom: 0.02in;        /* tweak until it sits nicely on the baseline */
+      font-size: 10px;
+    }
+
 
     .signature-container {
       margin-right: 0.50in;        /* shift line left so right end under amount center */
@@ -280,8 +289,11 @@
       <div class="bottom-row">
         <div class="memo-container">
           <div>Memo:</div>
-          <div class="memo-line" id="field-memo">{{Memo}}</div>
+          <div class="memo-line">
+            <span id="field-memo"></span>
+          </div>
         </div>
+
 
         <div class="signature-container">
           <div class="signature-line"></div>
@@ -312,21 +324,114 @@
       }
     }
 
+    function formatAmount(value) {
+  if (value == null || value === '') return '';
+  var num = Number(value);
+  if (isNaN(num)) return String(value);   // fall back if it isn't a number
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+
+
+function numberToWordsUnder1000(n) {
+  var ones = [
+    '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six',
+    'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve',
+    'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+    'Seventeen', 'Eighteen', 'Nineteen'
+  ];
+  var tens = [
+    '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty',
+    'Sixty', 'Seventy', 'Eighty', 'Ninety'
+  ];
+
+  var result = '';
+
+  if (n >= 100) {
+    result += ones[Math.floor(n / 100)] + ' Hundred';
+    n = n % 100;
+    if (n > 0) result += ' ';
+  }
+  if (n >= 20) {
+    result += tens[Math.floor(n / 10)];
+    n = n % 10;
+    if (n > 0) result += '-' + ones[n];
+  } else if (n > 0) {
+    result += ones[n];
+  }
+
+  return result || 'Zero';
+}
+
+function numberToWordsDollars(n) {
+  if (n === 0) return 'Zero';
+  if (!Number.isFinite(n) || n < 0) return String(n);
+
+  var parts = [];
+
+  var billions = Math.floor(n / 1_000_000_000);
+  if (billions) {
+    parts.push(numberToWordsUnder1000(billions) + ' Billion');
+    n = n % 1_000_000_000;
+  }
+
+  var millions = Math.floor(n / 1_000_000);
+  if (millions) {
+    parts.push(numberToWordsUnder1000(millions) + ' Million');
+    n = n % 1_000_000;
+  }
+
+  var thousands = Math.floor(n / 1_000);
+  if (thousands) {
+    parts.push(numberToWordsUnder1000(thousands) + ' Thousand');
+    n = n % 1_000;
+  }
+
+  if (n) {
+    parts.push(numberToWordsUnder1000(n));
+  }
+
+  return parts.join(' ');
+}
+
+function formatAmountInWords(value) {
+  if (value == null || value === '') return '';
+  var num = Number(value);
+  if (isNaN(num)) return String(value);
+
+  // Work in cents to avoid float weirdness
+  var centsTotal = Math.round(num * 100);
+  var dollars   = Math.floor(centsTotal / 100);
+  var cents     = centsTotal % 100;
+
+  var words = numberToWordsDollars(dollars);
+  var centsStr = String(cents).padStart(2, '0');
+
+  // Your preferred style: “One Thousand & 00/100 ----------------”
+  return words + ' & ' + centsStr + '/100 ----------------';
+}
+
+  
+    
     grist.onRecord(function(record) {
       if (!record) return;
       console.log('Selected row:', record);
 
       // These property names match what you saw in the console
       setText('field-payto',   record.Pay_To);
-      setText('field-amount',  record.Amount);
+      setText('field-amount',  formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
       setText('field-checkdate', record.Check_Date);
       setText('field-memo',    record.Memo);
+      setText('field-amountwords', formatAmountInWords(record.Amount));
 
       // MICR column is optional; name it MicrLine or Micr_Line in Grist
       setText('field-micr', record.MicrLine || record.Micr_Line || '');
 
-      // Amount-in-words we can handle later in JS; for now leave placeholder
+      
     });
   </script>
 </body>
