@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <title>Check Print Preview</title>
   <style>
+    .align-date {
+  width: 2.7in;        /* adjust until the right edge lines up exactly */
+  text-align: right;
+}
+.align-date .date-line {
+  min-width: 1.4in;    /* this controls the underline width */
+  margin-left: 0.10in;
+}
+
     /* ===== CUSTOM FONTS ===== */
     @font-face {
       font-family: 'Norwester';
@@ -310,7 +319,7 @@
           <div id="field-citystatezip">{{City}}, {{State}} {{Zip}}</div>
         </div>
 
-        <div class="date-block">
+        <div class="date-block align-date">
           Date: <span class="date-line" id="field-checkdate">{{CheckDate}}</span>
         </div>
 
