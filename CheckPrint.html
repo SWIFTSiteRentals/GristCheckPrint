@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Check Print Preview</title>
   <style>
+
+
     /* ===== CUSTOM FONTS ===== */
     @font-face {
       font-family: 'Norwester';
@@ -63,7 +65,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 250px;      /* large, spans most of check */
       letter-spacing: 0.12em;
-      color: red;
+      color: blue;
       opacity: 0.12;         /* light so it doesn't overpower text */
       pointer-events: none;
       display: none;
@@ -149,44 +151,44 @@
       font-size: 11px;
     }
 
-    /* ===== AMOUNT IN WORDS ===== */
-    .amount-words-row {
-      margin-top: 0.15in;
-      display: flex;
-      align-items: baseline;
-      gap: 0.08in;
-      position: relative;
-      z-index: 2;
-    }
+.amount-words-line {
+  position: relative;      /* IMPORTANT */
+  flex: 1;
+  padding-bottom: 0.03in;
+  /* REMOVE the original border-bottom here */
+}
 
-    .amount-words-line {
+/* Straight underline */
+.amount-words-underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;              /* sits at the bottom edge */
+  border-bottom: 1px solid #000;
+  height: 0;
+}
+
+/* Swoosh overlay */
+.amount-words-swoosh {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;            /* adjust if needed */
+  height: 0.18in;          /* adjust swoosh height */
+  pointer-events: none;
+  overflow: visible;
+}
+
+
+    .amount-words-swoosh {
       flex: 1;
-      border-bottom: 1px solid #000;   /* full underline */
-      padding-bottom: 0.03in;
-      display: flex;
-      align-items: flex-end;
-      position: relative;
-      min-height: 0.16in;
+      min-width: 0;
+      height: 0.12in;         /* tweak to taste */
     }
 
-    .amount-words-text {
-      font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
-      font-size: 11px;
-      white-space: nowrap;
-      padding-right: 0.06in;           /* small gap before swoosh */
-      z-index: 1;                      /* stay above the line graphics */
-    }
-
-    .amount-words-filler {
-      flex: 1;
-      height: 0.14in;                  /* height available for the swoosh */
-      display: block;
-    }
-
-    .amount-words-filler svg {
+    .amount-words-swoosh svg {
       width: 100%;
       height: 100%;
-      overflow: visible;
     }
 
     /* ===== BANK LOGO ROW ===== */
@@ -205,25 +207,30 @@
       gap: 0.05in;
     }
 
-    .bank-logo {
-      width: 2.4in;
-      height: 0.65in;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      text-align: center;
-      overflow: hidden;
-      position: relative;
-    }
+/* Master logo scale — change this ONE number */
+:root {
+  --logo-scale: 1.0;    /* try 0.8, 1.2, 1.5, etc */
+}
 
-    .bank-logo img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: none;
-    }
+.bank-logo {
+  width: calc(2.4in * var(--logo-scale));
+  height: calc(0.65in * var(--logo-scale));
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(9px * var(--logo-scale));
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.bank-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;  /* maintains perfect aspect ratio */
+}
+
 
     .bank-logo.has-logo #bank-logo-text {
       display: none;
@@ -352,28 +359,31 @@
         </div>
       </div>
 
-      <!-- AMOUNT IN WORDS -->
-      <div class="amount-words-row">
-        <div>***</div>
+<!-- AMOUNT IN WORDS -->
+<div class="amount-words-row">
+  <div>***</div>
 
-        <div class="amount-words-line">
-          <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
+  <div class="amount-words-line">
+    <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
 
-          <!-- filler area with swoosh only in the blank part -->
-          <span class="amount-words-filler">
-            <svg viewBox="0 0 100 10" preserveAspectRatio="none">
-              <!-- tweak these numbers if you want a different curve -->
-              <path d="M0,7 Q 50,1 100,7"
-                    fill="none"
-                    stroke="#000"
-                    stroke-width="1.2"
-                    stroke-linecap="round" />
-            </svg>
-          </span>
-        </div>
+    <!-- Real underline -->
+    <div class="amount-words-underline"></div>
 
-        <div>Dollars</div>
-      </div>
+    <!-- Swoosh -->
+    <div class="amount-words-swoosh">
+      <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+        <path d="M0,7 Q 50,0 100,7"
+              fill="none"
+              stroke="#000"
+              stroke-width="1.2"
+              stroke-linecap="round" />
+      </svg>
+    </div>
+  </div>
+
+  <div>Dollars</div>
+</div>
+
 
       <!-- BANK LOGO -->
       <div class="bank-row">
@@ -454,7 +464,7 @@
         result += tens[Math.floor(n / 10)];
         n = n % 10;
         if (n > 0) result += '-' + ones[n];
-      } else if (n > 0) {
+      } else if (n>0) {
         result += ones[n];
       }
 
@@ -504,7 +514,7 @@
       var words = numberToWordsDollars(dollars);
       var centsStr = String(cents).padStart(2, '0');
 
-      // no dashed tail; swoosh handles the fill
+      // no more dashed tail; swoosh handles the fill
       return words + ' & ' + centsStr + '/100';
     }
 
