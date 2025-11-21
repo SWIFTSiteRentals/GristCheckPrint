@@ -72,7 +72,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 250px;      /* large, spans most of check */
       letter-spacing: 0.12em;
-      color: red;
+      color: blue;
       opacity: 0.12;         /* light so it doesn't overpower text */
       pointer-events: none;
       display: none;
@@ -82,11 +82,12 @@
 
     /* ===== TOP HEADER ===== */
     .top-row {
-    display: flex;
-    align-items: flex-start;
-    position: relative;   /* keep this – needed for absolute positioning */
-    z-index: 2;
-  }
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      z-index: 2;
+    }
 
     .account-block {
       max-width: 55%;
@@ -102,9 +103,6 @@
     .date-block {
       font-size: 10px;
       margin-top: 0.05in;
-      position: absolute;
-      top: 0;
-      right: 2.00in;   /* tweak this value to line up the right end */
     }
 
     .date-line {
