@@ -48,8 +48,8 @@
     /* ===== CHECK AREA (EXACT 3.50") ===== */
     .check-area {
       width: 100%;
-      height: 3.50in;                 /* exact top-check height */
-      padding: 0.18in 0.25in 0.10in;  /* top padding avoids unprintable zone */
+      height: 3.50in;
+      padding: 0.18in 0.25in 0.10in;
       box-sizing: border-box;
       position: relative;
     }
@@ -225,7 +225,7 @@
       border-bottom: 1px solid #000;
       width: 2.6in;
       position: relative;
-      height: 0.18in;        /* fixed height so nothing moves */
+      height: 0.18in;
     }
 
     #field-memo {
@@ -240,7 +240,7 @@
     }
 
     .signature-container {
-      margin-right: 0.50in;        /* shift line left so right end under amount center */
+      margin-right: 0.50in;
     }
 
     .signature-line {
@@ -467,52 +467,46 @@
       return words + ' & ' + centsStr + '/100 ----------------';
     }
 
-// --- Bank table cache ---
-var bankById = null;            // { rowId: row }
-var bankByAccountName = null;   // { "SWIFT Checking": row }
+    // --- Bank table cache (by Account_Name text) ---
+    var bankByAccountName = null;
 
-async function ensureBankCache() {
-  if (bankById && bankByAccountName) return;
+    async function ensureBankCache() {
+      if (bankByAccountName) return;
 
-  bankById = {};
-  bankByAccountName = {};
+      bankByAccountName = {};
 
-  try {
-    var table = await grist.docApi.fetchTable('CheckAccountData');
-    var cols = table;
-    var ids = cols.id;   // primary key
+      try {
+        var table = await grist.docApi.fetchTable('CheckAccountData');
+        var cols = table;
+        var ids = cols.id || cols.ID || cols.Id;
+        if (!ids) return;
 
-    for (var i = 0; i < ids.length; i++) {
-      var rowId = ids[i];
-      var row = {
-        id: rowId,
-        Account_Name: cols.Account_Name ? cols.Account_Name[i] : null,
-        Account_Holder_Name: cols.Account_Holder_Name ? cols.Account_Holder_Name[i] : null,
-        Street_Address_Line_1: cols.Street_Address_Line_1 ? cols.Street_Address_Line_1[i] : null,
-        Street_Address_Line_2: cols.Street_Address_Line_2 ? cols.Street_Address_Line_2[i] : null,
-        City: cols.City ? cols.City[i] : null,
-        State: cols.State ? cols.State[i] : null,
-        Zip: cols.Zip ? cols.Zip[i] : null,
-        Bank_Name: cols.Bank_Name ? cols.Bank_Name[i] : null,
-        Bank_Logo: cols.Bank_Logo ? cols.Bank_Logo[i] : null,
-        Routing_Number: cols.Routing_Number ? cols.Routing_Number[i] : null,
-        Account_Number: cols.Account_Number ? cols.Account_Number[i] : null
-      };
+        for (var i = 0; i < ids.length; i++) {
+          var row = {
+            id: ids[i],
+            Account_Name: cols.Account_Name ? cols.Account_Name[i] : null,
+            Account_Holder_Name: cols.Account_Holder_Name ? cols.Account_Holder_Name[i] : null,
+            Street_Address_Line_1: cols.Street_Address_Line_1 ? cols.Street_Address_Line_1[i] : null,
+            Street_Address_Line_2: cols.Street_Address_Line_2 ? cols.Street_Address_Line_2[i] : null,
+            City: cols.City ? cols.City[i] : null,
+            State: cols.State ? cols.State[i] : null,
+            Zip: cols.Zip ? cols.Zip[i] : null,
+            Bank_Name: cols.Bank_Name ? cols.Bank_Name[i] : null,
+            Bank_Logo: cols.Bank_Logo ? cols.Bank_Logo[i] : null,
+            Routing_Number: cols.Routing_Number ? cols.Routing_Number[i] : null,
+            Account_Number: cols.Account_Number ? cols.Account_Number[i] : null
+          };
 
-      bankById[rowId] = row;
-
-      var acctName = row.Account_Name;
-      if (acctName) {
-        bankByAccountName[acctName.toString()] = row;
+          var acct = row.Account_Name;
+          if (acct) {
+            bankByAccountName[acct.toString().trim()] = row;
+          }
+        }
+      } catch (e) {
+        console.error('Error loading CheckAccountData table:', e);
+        bankByAccountName = {};
       }
     }
-  } catch (e) {
-    console.error('Error loading CheckAccountData table', e);
-    bankById = {};
-    bankByAccountName = {};
-  }
-}
-
 
     function buildCityStateZip(row) {
       var city = row.City || '';
@@ -526,11 +520,17 @@ async function ensureBankCache() {
       return line;
     }
 
+    function resolveBankRow(bankCell) {
+      if (!bankCell || !bankByAccountName) return null;
+      var key = bankCell.toString().trim();
+      return bankByAccountName[key] || null;
+    }
+
     async function updateFromRecord(record) {
       if (!record) return;
       console.log('Selected row:', record);
 
-      // Core check fields (from CheckRegister)
+      // Core check fields
       setText('field-payto', record.Pay_To);
       setText('field-amount', formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
@@ -538,14 +538,14 @@ async function ensureBankCache() {
       setText('field-memo', record.Memo);
       setText('field-amountwords', formatAmountInWords(record.Amount));
 
-      // VOID watermark when Status starts with "void"
+      // VOID watermark
       var status = (record.Status || '').toString().toLowerCase();
       var voidEl = document.getElementById('void-watermark');
       if (voidEl) {
         voidEl.style.display = status.startsWith('void') ? 'block' : 'none';
       }
 
-      // Default: clear account header + MICR in case bank lookup fails
+      // Clear header + MICR before filling
       setText('field-accountname', '');
       setText('field-addr1', '');
       var addr2El = document.getElementById('field-addr2');
@@ -556,7 +556,6 @@ async function ensureBankCache() {
       setText('field-citystatezip', '');
       setText('field-micr', '');
 
-      // Also reset logo area
       var logoWrapper = document.getElementById('field-banklogo');
       var logoImg = document.getElementById('bank-logo-img');
       var logoText = document.getElementById('bank-logo-text');
@@ -567,36 +566,25 @@ async function ensureBankCache() {
         logoText.textContent = '{{BankName}} LOGO';
       }
 
-      // If no bank reference at all, we are done
-      if (record.Bank == null) {
+      // No bank? stop here
+      if (record.Bank == null || record.Bank === '') {
         return;
       }
 
-      // Look up bank row by reference id (tight assumption: Bank is a Ref to CheckAccountData)
-await ensureBankCache();
-
-// Bank in CheckRegister is linked to Account_Name text, e.g. "SWIFT Checking"
-var bankRow = null;
-if (record.Bank != null && bankByAccountName) {
-  var key = record.Bank.toString();
-  bankRow = bankByAccountName[key] || null;
-}
-
-console.log('Bank cell from record:', record.Bank, 'Resolved bankRow:', bankRow);
-
+      // Load bank table and resolve row by Account_Name
+      await ensureBankCache();
+      var bankRow = resolveBankRow(record.Bank);
+      console.log('Resolved bankRow:', bankRow);
 
       if (!bankRow) {
         return;
       }
 
-      // Account holder / business name
+      // Account / address
       var acctName = bankRow.Account_Holder_Name || bankRow.Account_Name || '';
       setText('field-accountname', acctName);
-
-      // Address line 1
       setText('field-addr1', bankRow.Street_Address_Line_1 || '');
 
-      // Address line 2, hidden when empty
       if (addr2El) {
         var addr2Val = bankRow.Street_Address_Line_2 || '';
         if (addr2Val) {
@@ -608,13 +596,12 @@ console.log('Bank cell from record:', record.Bank, 'Resolved bankRow:', bankRow)
         }
       }
 
-      // City/State/Zip
       setText('field-citystatezip', buildCityStateZip(bankRow));
 
-      // Bank name text fallback
+      // Bank name text / logo placeholder
       var bankName = bankRow.Bank_Name || '';
       if (logoText) {
-        logoText.textContent = (bankName ? bankName + ' LOGO' : 'BANK LOGO');
+        logoText.textContent = bankName ? (bankName + ' LOGO') : 'BANK LOGO';
       }
 
       // Bank logo from attachment
@@ -639,7 +626,7 @@ console.log('Bank cell from record:', record.Bank, 'Resolved bankRow:', bankRow)
         }
       }
 
-      // MICR line: explicit field on CheckRegister wins; otherwise build from routing/account/check
+      // MICR line
       var micr = record.MicrLine || record.Micr_Line;
       if (!micr) {
         var routing = bankRow.Routing_Number;
