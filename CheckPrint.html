@@ -63,7 +63,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: dim grey;
+      color: dimgray;
       opacity: 0.10;
       pointer-events: none;
       display: none;
@@ -340,20 +340,24 @@
       margin-left: 0.25in;
     }
 
-    /* ===== MICR LINE (E-13B) ===== */
+    /* ===== MICR LINE (E-13B) =====
+       Kept for future use / debugging but visually hidden.
+       MICR characters the bank will see are the ones in the 62 boxes. */
     .micr-line {
       position: absolute;
-      bottom: 0.12in;
+      bottom: 0.19in;          /* ~3/16" from bottom per ANSI */
       left: 0.55in;
       right: 0.30in;
-      font-family: 'MICR', monospace;
-      font-size: 20px;
-      letter-spacing: 0.08em;
+      font-family: 'MICR';
+      font-size: 10pt;         /* adjust to whatever your MICR font vendor specifies */
+      letter-spacing: 0;       /* MICR spacing must not be tracked */
       text-align: left;
-      z-index: 2;
+      z-index: 1;
+      color: transparent;      /* do not print this line; boxes handle actual MICR */
+      pointer-events: none;
     }
 
-    /* ===== MICR DEBUG BAND & GRID (DEV ONLY) ===== */
+    /* ===== MICR DEBUG BAND & GRID (DEV + ACTUAL MICR CHARS) ===== */
     .micr-debug-band {
       position: absolute;
       bottom: 0;
@@ -361,20 +365,20 @@
       right: 0.25in;
       height: 0.625in;       /* ANSI clear band height */
       box-sizing: border-box;
-      z-index: 1;            /* behind the real MICR line */
-      border: 1px solid rgba(0,0,0,0.6);
+      z-index: 2;
+      border: 1px solid rgba(0,0,0,0.6);  /* dev only, hide later for production */
       border-bottom: none;
       background: rgba(255,255,255,0.6);
     }
 
     .micr-debug-grid {
       position: absolute;
-      bottom: 0.10in;        /* approximate MICR character band */
+      bottom: 0.187in;       /* ~3/16" from bottom: start of 0.25" MICR print band */
       left: 0;
       right: 0;
-      height: 0.25in;
+      height: 0.25in;        /* MICR print band height */
       display: grid;
-      grid-template-columns: repeat(62, 1fr);
+      grid-template-columns: repeat(62, 1fr);  /* positions 62..01 */
       border-top: 1px solid rgba(0,0,0,0.7);
       border-bottom: 1px solid rgba(0,0,0,0.7);
     }
@@ -385,7 +389,7 @@
       line-height: 0.25in;
       text-align: center;
       position: relative;
-      font-size: 16px;
+      font-size: 10pt;       /* match MICR spec size */
     }
 
     .micr-debug-cell:last-child {
@@ -481,11 +485,13 @@
           <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
           <span class="amount-words-filler">
             <svg viewBox="0 0 100 10" preserveAspectRatio="none">
-              <path d="M0,7 Q 50,1 100,7"
-                    fill="none"
-                    stroke="#000"
-                    stroke-width="1.2"
-                    stroke-linecap="round" />
+              <path
+                d="M0,7 Q 50,1 100,7"
+                fill="none"
+                stroke="#000"
+                stroke-width="1.2"
+                stroke-linecap="round"
+              />
             </svg>
           </span>
         </div>
@@ -516,12 +522,10 @@
         </div>
       </div>
 
-      <!-- MICR LINE -->
-      <div class="micr-line" id="field-micr">
-        {{MicrLine}}
-      </div>
+      <!-- MICR LINE (hidden text, real MICR is in grid cells) -->
+      <div class="micr-line" id="field-micr"></div>
 
-      <!-- MICR DEBUG BAND + GRID -->
+      <!-- MICR DEBUG BAND + GRID (holds the actual MICR characters) -->
       <div class="micr-debug-band">
         <div class="micr-debug-grid" id="micr-debug-grid"></div>
       </div>
@@ -642,7 +646,7 @@
 
         var charSpan = document.createElement('span');
         charSpan.className = 'micr-debug-char';
-        charSpan.textContent = '';  // will be filled later
+        charSpan.textContent = '';
 
         var idx = document.createElement('div');
         idx.className = 'micr-debug-index';
@@ -764,7 +768,7 @@
         voidEl.style.display = status.startsWith('void') ? 'block' : 'none';
       }
 
-      // Clear header + MICR before filling
+      // Clear header before filling
       setText('field-accountname', '');
       setText('field-addr1', '');
       var addr2El = document.getElementById('field-addr2');
@@ -773,7 +777,8 @@
         addr2El.textContent = '';
       }
       setText('field-citystatezip', '');
-      setText('field-micr', '');
+      // do NOT set field-micr text anymore – we only use boxes
+      updateMicrGrid('');
 
       var logoWrapper = document.getElementById('field-banklogo');
       var logoImg = document.getElementById('bank-logo-img');
@@ -838,17 +843,19 @@
         }
       }
 
-      // MICR line
+      // MICR line string (for the boxes only)
       var micr = record.MicrLine || record.Micr_Line;
       if (!micr) {
         var routing = bankRow.Routing_Number;
         var account = bankRow.Account_Number;
         var chk = record.Check_Number;
         if (routing && account && chk != null && chk !== '') {
+          // A = transit symbol, C = on-us symbol
           micr = 'A' + routing + 'A ' + account + 'C ' + chk + 'C';
         }
       }
-      setText('field-micr', micr || '');
+
+      // We no longer print the MICR string as a separate line; only in the boxes
       updateMicrGrid(micr || '');
     }
 
