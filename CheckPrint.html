@@ -90,7 +90,7 @@
       font-size: 12px;
       letter-spacing: 0.03em;
     }
-    
+
     .date-block {
       font-size: 14px;
       position: absolute;
@@ -147,7 +147,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: .5in;
+      width: 0.5in;
     }
 
     .payee-label-inner {
@@ -157,20 +157,18 @@
     }
 
     .payee-line {
-    border-bottom: 1px solid #000;
-    border-right: 1px solid #000;   /* vertical line at end of payee line */
-    flex: 1;
-    padding-bottom: 0.03in;
-    font-size: 16px;
+      border-bottom: 1px solid #000;
+      border-right: 1px solid #000;
+      flex: 1;
+      padding-bottom: 0.03in;
+      font-size: 16px;
       font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
+      padding-right: 0.03in;
 
-    padding-right: 0.03in;
-
-    /* pull the line left under "PAY TO THE ORDER OF" */
-    margin-left: -0.60in;   /* = .5in label width + 0.10in gap */
-    padding-left: 0.60in;   /* push the {{PayTo}} text back to where it was */
+      /* pull the line left under "PAY TO THE ORDER OF" */
+      margin-left: -0.60in;   /* = .5in label width + 0.10in gap */
+      padding-left: 0.60in;   /* push the {{PayTo}} text back to where it was */
     }
-    
 
     .amount-block-inline {
       display: flex;
@@ -180,10 +178,9 @@
     }
 
     .amount-dollar {
-      font-size: 16px;      /* larger dollar sign */
-/*      font-weight: bold; */
+      font-size: 16px;
       line-height: 1;
-      margin-top: -0.02in;  /* tiny lift to center visually */
+      margin-top: -0.02in;
     }
 
     .amount-box {
@@ -195,101 +192,85 @@
     }
 
     /* ===== AMOUNT IN WORDS ===== */
-.amount-words-row {
-  margin-top: 0.15in;
-  display: flex;
-  align-items: baseline;
-  gap: 0.08in;
-  position: relative;
-  z-index: 2;
-}
+    .amount-words-row {
+      margin-top: 0.15in;
+      display: flex;
+      align-items: baseline;
+      gap: 0.08in;
+      position: relative;
+      z-index: 2;
+    }
 
-.amount-words-line {
-  flex: 1;
-  border-bottom: 1px solid #000;
-  padding-bottom: 0.03in;
-  display: flex;
-  align-items: flex-end;
-  position: relative;
-  min-height: 0.16in;
-  /* no margin-left / padding-left here */
-}
+    .amount-words-line {
+      flex: 1;
+      border-bottom: 1px solid #000;
+      padding-bottom: 0.03in;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      min-height: 0.16in;
+    }
 
-.amount-words-text {
-  font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
-  font-size: 12px;
-  white-space: nowrap;
-  padding-right: 0.06in;
-  z-index: 1;
-}
+    .amount-words-text {
+      font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
+      font-size: 12px;
+      white-space: nowrap;
+      padding-right: 0.06in;
+      z-index: 1;
+    }
 
-.amount-words-filler {
-  flex: 1;
-  height: 0.14in;
-  display: block;
-}
+    .amount-words-filler {
+      flex: 1;
+      height: 0.14in;
+      display: block;
+    }
 
-.amount-words-filler svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
+    .amount-words-filler svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
 
-.amount-words-dollars {
-  font-size: 11px;     /* adjust this number */
-  letter-spacing: 0.03em;
-  text-transform: uppercase;  /* ensures DOLLARS */
-}
-
+    .amount-words-dollars {
+      font-size: 11px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
 
     /* ===== BANK LOGO ROW ===== */
-.bank-row {
-  margin-top: 0.18in;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  position: relative;
-  z-index: 2;
+    .bank-row {
+      margin-top: 0.18in;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      height: 0.75in;          /* fixed vertical space for logo row */
+    }
 
-  /* FIXED vertical space for logo row */
-  height: 0.75in;          /* pick a value that comfortably fits your largest logo */
-}
+    .bank-logo-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05in;
+    }
 
-.bank-logo-block {
-  display: flex;
-  flex-direction: column;
-  gap: 0.05in;
-}
+    :root {
+      --logo-scale: 0.8;
+    }
 
-/* Master logo scale — change this ONE number */
-:root {
-  --logo-scale: 0.8;
-}
-
-.bank-logo {
-  /* width can still scale */
-  width: calc(2.4in * var(--logo-scale));
-
-  /* height is now fixed, so row height doesn't change */
-  height: 0.65in;
-
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateX(0.175in);
-  font-size: calc(9px * var(--logo-scale));
-  text-align: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.bank-logo img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
+    .bank-logo {
+      width: calc(2.4in * var(--logo-scale));
+      height: 0.65in;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(0.175in);
+      font-size: calc(9px * var(--logo-scale));
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
 
     .bank-logo img {
       max-width: 100%;
@@ -301,79 +282,129 @@
       display: none;
     }
 
-/* ===== MEMO + SIGNATURE AREA ===== */
-.bottom-row {
-  margin-top: 0.22in;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;   /* align the tops */
-  font-size: 10px;
-  position: relative;
-  z-index: 2;
-}
+    /* ===== MEMO + SIGNATURE AREA ===== */
+    .bottom-row {
+      margin-top: 0.22in;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 10px;
+      position: relative;
+      z-index: 2;
+    }
 
-/* MEMO LEFT SIDE */
-.memo-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 3.0in;
-}
+    .memo-wrapper {
+      display: flex;
+      flex-direction: column;
+      width: 3.0in;
+    }
 
-.memo-line {
-  position: relative;
-  border-bottom: 1px solid #000;
-  width: 100%;
-  height: 0.18in;            /* matches signature height */
-  
-}
+    .memo-line {
+      position: relative;
+      border-bottom: 1px solid #000;
+      width: 100%;
+      height: 0.18in;
+    }
 
-#field-memo {
-  position: absolute;
-  left: 0;
-  bottom: 0.02in;
-  font-size: 12px;
-    font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
+    #field-memo {
+      position: absolute;
+      left: 0;
+      bottom: 0.02in;
+      font-size: 12px;
+      font-family: 'Lacquer', 'Open Sans', Arial, sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      right: 0;
+    }
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  right: 0;
-}
+    .memo-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-top: 0.01in;
+      width: 100%;
+      text-align: right;
+    }
 
-.memo-label {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-top: 0.01in;
-  width: 100%;
-  text-align: right;         /* same behavior as DATE label */
-}
+    .signature-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
 
-/* SIGNATURE RIGHT SIDE */
-.signature-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.signature-line {
-  border-bottom: 1px solid #000;
-  width: 3.5in;
-  height: 0.18in;            /* matches memo line for alignment */
-  margin-left: 0.25in;
-}
+    .signature-line {
+      border-bottom: 1px solid #000;
+      width: 3.5in;
+      height: 0.18in;
+      margin-left: 0.25in;
+    }
 
     /* ===== MICR LINE (E-13B) ===== */
     .micr-line {
       position: absolute;
       bottom: 0.12in;
-      left: 0.550in;
+      left: 0.55in;
       right: 0.30in;
       font-family: 'MICR', monospace;
       font-size: 20px;
       letter-spacing: 0.08em;
       text-align: left;
       z-index: 2;
+    }
+
+    /* ===== MICR DEBUG BAND & GRID (DEV ONLY) ===== */
+    .micr-debug-band {
+      position: absolute;
+      bottom: 0;
+      left: 0.25in;          /* align with check-area padding */
+      right: 0.25in;
+      height: 0.625in;       /* ANSI clear band height */
+      box-sizing: border-box;
+      z-index: 1;            /* behind the real MICR line */
+      border: 1px solid rgba(0,0,0,0.6);
+      border-bottom: none;
+      background: rgba(255,255,255,0.6);
+    }
+
+    .micr-debug-grid {
+      position: absolute;
+      bottom: 0.10in;        /* approximate MICR character band */
+      left: 0;
+      right: 0;
+      height: 0.25in;
+      display: grid;
+      grid-template-columns: repeat(62, 1fr);
+      border-top: 1px solid rgba(0,0,0,0.7);
+      border-bottom: 1px solid rgba(0,0,0,0.7);
+    }
+
+    .micr-debug-cell {
+      border-left: 1px solid rgba(0,0,0,0.6);
+      font-family: 'MICR', monospace;
+      line-height: 0.25in;
+      text-align: center;
+      position: relative;
+      font-size: 16px;
+    }
+
+    .micr-debug-cell:last-child {
+      border-right: 1px solid rgba(0,0,0,0.6);
+    }
+
+    .micr-debug-char {
+      display: block;
+      height: 100%;
+    }
+
+    .micr-debug-index {
+      position: absolute;
+      bottom: -0.09in;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Open Sans', Arial, sans-serif;
+      font-size: 6px;
+      color: #333;
     }
 
     /* ===== PRINT BUTTON ===== */
@@ -404,12 +435,9 @@
 </head>
 <body>
   <div class="page">
-    <!-- PRINT BUTTON -->
     <button class="print-button" onclick="window.print()">Print</button>
 
-    <!-- ================= CHECK AREA ================= -->
     <div class="check-area">
-
       <!-- VOID WATERMARK -->
       <div class="void-watermark" id="void-watermark">VOID</div>
 
@@ -447,27 +475,22 @@
         </div>
       </div>
 
-    <!-- AMOUNT IN WORDS -->
-    <div class="amount-words-row">
-
-    <div class="amount-words-line">
-        <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
-
-        <!-- filler area extending the underline -->
-        <span class="amount-words-filler">
-        <svg viewBox="0 0 100 10" preserveAspectRatio="none">
-            <path d="M0,7 Q 50,1 100,7"
-                fill="none"
-                stroke="#000"
-                stroke-width="1.2"
-                stroke-linecap="round" />
-        </svg>
-        </span>
-    </div>
-
-<div class="amount-words-dollars">DOLLARS</div>
-    </div>
-
+      <!-- AMOUNT IN WORDS -->
+      <div class="amount-words-row">
+        <div class="amount-words-line">
+          <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
+          <span class="amount-words-filler">
+            <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+              <path d="M0,7 Q 50,1 100,7"
+                    fill="none"
+                    stroke="#000"
+                    stroke-width="1.2"
+                    stroke-linecap="round" />
+            </svg>
+          </span>
+        </div>
+        <div class="amount-words-dollars">DOLLARS</div>
+      </div>
 
       <!-- BANK LOGO -->
       <div class="bank-row">
@@ -479,36 +502,34 @@
         </div>
       </div>
 
-        <!-- MEMO + SIGNATURE -->
-        <div class="bottom-row">
-
-        <!-- MEMO LEFT -->
+      <!-- MEMO + SIGNATURE -->
+      <div class="bottom-row">
         <div class="memo-wrapper">
-            <div class="memo-line">
+          <div class="memo-line">
             <span id="field-memo"></span>
-            </div>
-            <div class="memo-label">MEMO</div>
+          </div>
+          <div class="memo-label">MEMO</div>
         </div>
 
-        <!-- SIGNATURE RIGHT -->
         <div class="signature-container">
-            <div class="signature-line"></div>
+          <div class="signature-line"></div>
         </div>
+      </div>
 
-        </div>
-
-
-      <!-- MICR -->
+      <!-- MICR LINE -->
       <div class="micr-line" id="field-micr">
         {{MicrLine}}
       </div>
 
+      <!-- MICR DEBUG BAND + GRID -->
+      <div class="micr-debug-band">
+        <div class="micr-debug-grid" id="micr-debug-grid"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    grist.ready();
-
+    /* ===== BASIC HELPERS ===== */
     function setText(id, value) {
       var el = document.getElementById(id);
       if (!el) return;
@@ -525,11 +546,10 @@
       if (isNaN(num)) return String(value);
       return num.toLocaleString('en-US', {
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 2
       });
     }
 
-    // --- Number-to-words helpers for amount-in-words ---
     function numberToWordsUnder1000(n) {
       var ones = [
         '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six',
@@ -606,7 +626,63 @@
       return words + ' & ' + centsStr + '/100';
     }
 
-    // --- Bank table cache (by Account_Name text) ---
+    /* ===== MICR GRID CREATION + UPDATE ===== */
+    var TOTAL_MICR_BOXES = 62;
+
+    function initMicrGrid() {
+      var grid = document.getElementById('micr-debug-grid');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+
+      // positions 62..01 left to right
+      for (var pos = TOTAL_MICR_BOXES; pos >= 1; pos--) {
+        var cell = document.createElement('div');
+        cell.className = 'micr-debug-cell';
+
+        var charSpan = document.createElement('span');
+        charSpan.className = 'micr-debug-char';
+        charSpan.textContent = '';  // will be filled later
+
+        var idx = document.createElement('div');
+        idx.className = 'micr-debug-index';
+        idx.textContent = (pos < 10 ? '0' + pos : String(pos));
+
+        cell.appendChild(charSpan);
+        cell.appendChild(idx);
+        grid.appendChild(cell);
+      }
+    }
+
+    // micrString is right-aligned; rightmost char goes in box 01.
+    function updateMicrGrid(micrString) {
+      var grid = document.getElementById('micr-debug-grid');
+      if (!grid) return;
+
+      micrString = (micrString || '').toString();
+      var cells = grid.children;
+      var len = micrString.length;
+
+      // clear all first
+      for (var i = 0; i < cells.length; i++) {
+        var span = cells[i].querySelector('.micr-debug-char');
+        if (span) span.textContent = '';
+      }
+
+      // fill from right to left
+      for (var i = 0; i < len && i < TOTAL_MICR_BOXES; i++) {
+        var ch = micrString[len - 1 - i];
+        // box index from right is i (0-based) -> logical position (i+1)
+        // grid is 62..01 left->right, so box 01 is last child
+        var cellIndex = TOTAL_MICR_BOXES - 1 - i;
+        var cell = cells[cellIndex];
+        if (!cell) continue;
+        var charSpan = cell.querySelector('.micr-debug-char');
+        if (charSpan) charSpan.textContent = ch;
+      }
+    }
+
+    /* ===== GRIST INTEGRATION ===== */
     var bankByAccountName = null;
 
     async function ensureBankCache() {
@@ -615,6 +691,10 @@
       bankByAccountName = {};
 
       try {
+        if (!window.grist || !grist.docApi) {
+          return;
+        }
+
         var table = await grist.docApi.fetchTable('CheckAccountData');
         var cols = table;
         var ids = cols.id;
@@ -670,7 +750,6 @@
       if (!record) return;
       console.log('Selected row:', record);
 
-      // Core check fields
       setText('field-payto', record.Pay_To);
       setText('field-amount', formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
@@ -708,15 +787,16 @@
 
       // No bank? stop here
       if (record.Bank == null || record.Bank === '') {
+        updateMicrGrid('');
         return;
       }
 
-      // Load bank table and resolve row by Account_Name
       await ensureBankCache();
       var bankRow = resolveBankRow(record.Bank);
       console.log('Resolved bankRow:', bankRow);
 
       if (!bankRow) {
+        updateMicrGrid('');
         return;
       }
 
@@ -747,7 +827,6 @@
       // Bank logo via URL column (Logo_URL)
       if (logoWrapper && logoImg) {
         var logoUrl = (bankRow.Logo_URL || '').toString().trim();
-
         if (logoUrl) {
           logoImg.src = logoUrl;
           logoImg.style.display = 'block';
@@ -770,10 +849,26 @@
         }
       }
       setText('field-micr', micr || '');
+      updateMicrGrid(micr || '');
     }
 
-    grist.onRecord(function(record) {
-      updateFromRecord(record);
+    /* ===== STARTUP ===== */
+    document.addEventListener('DOMContentLoaded', function () {
+      // Build empty 62-box grid so it shows even when not in Grist.
+      initMicrGrid();
+
+      // Optional: show template MICR placeholder locally
+      updateMicrGrid('{{MicrLine}}');
+
+      // Hook Grist if available
+      if (window.grist && typeof grist.ready === 'function') {
+        grist.ready();
+        if (typeof grist.onRecord === 'function') {
+          grist.onRecord(function (record) {
+            updateFromRecord(record);
+          });
+        }
+      }
     });
   </script>
 </body>
