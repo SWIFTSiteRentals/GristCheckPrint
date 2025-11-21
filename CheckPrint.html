@@ -63,7 +63,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 250px;
       letter-spacing: 0.12em;
-      color: blue;
+      color: red;
       opacity: 0.12;
       pointer-events: none;
       display: none;
@@ -243,39 +243,53 @@
 
 
     /* ===== BANK LOGO ROW ===== */
-    .bank-row {
-      margin-top: 0.18in;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      position: relative;
-      z-index: 2;
-    }
+.bank-row {
+  margin-top: 0.18in;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  z-index: 2;
 
-    .bank-logo-block {
-      display: flex;
-      flex-direction: column;
-      gap: 0.05in;
-    }
+  /* FIXED vertical space for logo row */
+  height: 0.75in;          /* pick a value that comfortably fits your largest logo */
+}
 
-    /* Master logo scale — change this ONE number */
-    :root {
-      --logo-scale: 0.8;
-    }
+.bank-logo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05in;
+}
 
-    .bank-logo {
-      width: calc(2.4in * var(--logo-scale));
-      height: calc(0.65in * var(--logo-scale));
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform: translateX(0.175in);
-      font-size: calc(9px * var(--logo-scale));
-      text-align: center;
-      overflow: hidden;
-      position: relative;
-    }
+/* Master logo scale — change this ONE number */
+:root {
+  --logo-scale: 0.8;
+}
+
+.bank-logo {
+  /* width can still scale */
+  width: calc(2.4in * var(--logo-scale));
+
+  /* height is now fixed, so row height doesn't change */
+  height: 0.65in;
+
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(0.175in);
+  font-size: calc(9px * var(--logo-scale));
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.bank-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 
     .bank-logo img {
       max-width: 100%;
