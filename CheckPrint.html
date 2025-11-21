@@ -467,27 +467,42 @@
       return words + ' & ' + centsStr + '/100 ----------------';
     }
 
-    // --- Bank table cache ---
-    var bankTableCache = null;
-    var bankById = {};
+    // --- Bank table cache (tight to your schema) ---
+    var bankById = null;   // { rowId: { ...row } }
 
-    async function loadBankTable() {
-      if (bankTableCache) return bankTableCache;
-      // Table name must match your bank table (CheckAccountData)
-      bankTableCache = await grist.docApi.fetchTable('CheckAccountData');
-      var cols = bankTableCache;
-      var ids = cols.id || cols.ID || cols.Id;
-      if (!ids) return bankTableCache;
+    async function ensureBankCache() {
+      if (bankById) return;
 
-      for (var i = 0; i < ids.length; i++) {
-        var rowId = ids[i];
-        var row = {};
-        for (var colId in cols) {
-          row[colId] = cols[colId][i];
+      try {
+        var table = await grist.docApi.fetchTable('CheckAccountData');  // exact table name
+        var cols = table;
+        var ids = cols.id;  // Grist primary key column is "id"
+
+        bankById = {};
+
+        for (var i = 0; i < ids.length; i++) {
+          var rowId = ids[i];
+          var row = {
+            // tight mapping to your actual column IDs
+            id: rowId,
+            Account_Name: cols.Account_Name ? cols.Account_Name[i] : null,
+            Account_Holder_Name: cols.Account_Holder_Name ? cols.Account_Holder_Name[i] : null,
+            Street_Address_Line_1: cols.Street_Address_Line_1 ? cols.Street_Address_Line_1[i] : null,
+            Street_Address_Line_2: cols.Street_Address_Line_2 ? cols.Street_Address_Line_2[i] : null,
+            City: cols.City ? cols.City[i] : null,
+            State: cols.State ? cols.State[i] : null,
+            Zip: cols.Zip ? cols.Zip[i] : null,
+            Bank_Name: cols.Bank_Name ? cols.Bank_Name[i] : null,
+            Bank_Logo: cols.Bank_Logo ? cols.Bank_Logo[i] : null,
+            Routing_Number: cols.Routing_Number ? cols.Routing_Number[i] : null,
+            Account_Number: cols.Account_Number ? cols.Account_Number[i] : null
+          };
+          bankById[rowId] = row;
         }
-        bankById[rowId] = row;
+      } catch (e) {
+        console.error('Error loading CheckAccountData table', e);
+        bankById = {};  // prevent repeated failing calls
       }
-      return bankTableCache;
     }
 
     function buildCityStateZip(row) {
@@ -506,7 +521,7 @@
       if (!record) return;
       console.log('Selected row:', record);
 
-      // Basic check fields
+      // Core check fields (from CheckRegister)
       setText('field-payto', record.Pay_To);
       setText('field-amount', formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
@@ -514,99 +529,110 @@
       setText('field-memo', record.Memo);
       setText('field-amountwords', formatAmountInWords(record.Amount));
 
-      // VOID watermark based on Status starting with "void"
+      // VOID watermark when Status starts with "void"
       var status = (record.Status || '').toString().toLowerCase();
       var voidEl = document.getElementById('void-watermark');
       if (voidEl) {
-        if (status.startsWith('void')) {
-          voidEl.style.display = 'block';
-        } else {
-          voidEl.style.display = 'none';
-        }
+        voidEl.style.display = status.startsWith('void') ? 'block' : 'none';
       }
 
-      // Load bank table (once), then pull the linked account
-      await loadBankTable();
-      var bankRow = null;
-      if (record.Bank != null && bankById[record.Bank]) {
-        bankRow = bankById[record.Bank];
+      // Default: clear account header + MICR in case bank lookup fails
+      setText('field-accountname', '');
+      setText('field-addr1', '');
+      var addr2El = document.getElementById('field-addr2');
+      if (addr2El) {
+        addr2El.style.display = 'none';
+        addr2El.textContent = '';
+      }
+      setText('field-citystatezip', '');
+      setText('field-micr', '');
+
+      // Also reset logo area
+      var logoWrapper = document.getElementById('field-banklogo');
+      var logoImg = document.getElementById('bank-logo-img');
+      var logoText = document.getElementById('bank-logo-text');
+      if (logoWrapper && logoImg && logoText) {
+        logoWrapper.classList.remove('has-logo');
+        logoImg.src = '';
+        logoImg.style.display = 'none';
+        logoText.textContent = '{{BankName}} LOGO';
       }
 
-      if (bankRow) {
-        // 1) Account holder / business name
-        var acctName = bankRow.Account_Holder_Name || bankRow.Account_Name || '';
-        setText('field-accountname', acctName);
+      // If no bank reference at all, we are done
+      if (record.Bank == null) {
+        return;
+      }
 
-        // 1) Address lines
-        setText('field-addr1', bankRow.Street_Address_Line_1 || '');
+      // Look up bank row by reference id (tight assumption: Bank is a Ref to CheckAccountData)
+      await ensureBankCache();
+      var bankRow = bankById ? bankById[record.Bank] : null;
+      console.log('Resolved bankRow:', bankRow);
 
-        // Street Address Line 2: hide row entirely when blank
-        var addr2El = document.getElementById('field-addr2');
+      if (!bankRow) {
+        return;
+      }
+
+      // Account holder / business name
+      var acctName = bankRow.Account_Holder_Name || bankRow.Account_Name || '';
+      setText('field-accountname', acctName);
+
+      // Address line 1
+      setText('field-addr1', bankRow.Street_Address_Line_1 || '');
+
+      // Address line 2, hidden when empty
+      if (addr2El) {
         var addr2Val = bankRow.Street_Address_Line_2 || '';
-        if (addr2El) {
-          if (addr2Val) {
-            addr2El.style.display = '';
-            addr2El.textContent = addr2Val;
-          } else {
-            addr2El.style.display = 'none';
-            addr2El.textContent = '';
-          }
+        if (addr2Val) {
+          addr2El.style.display = '';
+          addr2El.textContent = addr2Val;
+        } else {
+          addr2El.style.display = 'none';
+          addr2El.textContent = '';
         }
+      }
 
-        setText('field-citystatezip', buildCityStateZip(bankRow));
+      // City/State/Zip
+      setText('field-citystatezip', buildCityStateZip(bankRow));
 
-        // 1 & 2) Bank name text fallback
-        var bankNameText = (bankRow.Bank_Name || '') + ' LOGO';
-        setText('bank-logo-text', bankNameText);
+      // Bank name text fallback
+      var bankName = bankRow.Bank_Name || '';
+      if (logoText) {
+        logoText.textContent = (bankName ? bankName + ' LOGO' : 'BANK LOGO');
+      }
 
-        // 2) Bank logo attachment
-        var logoWrapper = document.getElementById('field-banklogo');
-        var logoImg = document.getElementById('bank-logo-img');
+      // Bank logo from attachment
+      if (logoWrapper && logoImg) {
         var logoCell = bankRow.Bank_Logo;
-        if (logoImg && logoWrapper) {
-          if (Array.isArray(logoCell) && logoCell.length > 0) {
-            try {
-              var url = await grist.docApi.getAttachmentUrl(logoCell[0]);
-              logoImg.src = url;
-              logoImg.style.display = 'block';
-              logoWrapper.classList.add('has-logo');
-            } catch (e) {
-              console.error('Error loading logo attachment', e);
-              logoImg.src = '';
-              logoImg.style.display = 'none';
-              logoWrapper.classList.remove('has-logo');
-            }
-          } else {
+        if (Array.isArray(logoCell) && logoCell.length > 0) {
+          try {
+            var url = await grist.docApi.getAttachmentUrl(logoCell[0]);
+            logoImg.src = url;
+            logoImg.style.display = 'block';
+            logoWrapper.classList.add('has-logo');
+          } catch (e) {
+            console.error('Error loading bank logo attachment', e);
             logoImg.src = '';
             logoImg.style.display = 'none';
             logoWrapper.classList.remove('has-logo');
           }
+        } else {
+          logoImg.src = '';
+          logoImg.style.display = 'none';
+          logoWrapper.classList.remove('has-logo');
         }
-
-        // MICR line: prefer explicit MicrLine column, otherwise build from routing/account/check
-        var micr = record.MicrLine || record.Micr_Line;
-        if (!micr) {
-          var routing = bankRow.Routing_Number;
-          var account = bankRow.Account_Number;
-          var chk = record.Check_Number;
-          if (routing && account && chk != null) {
-            // Basic E-13B style with transit (A) and on-us (C) symbols.
-            micr = 'A' + routing + 'A ' + String(chk) + 'C ' + account + 'C';
-          }
-        }
-        setText('field-micr', micr || '');
-      } else {
-        // No bank record: clear header fields and MICR
-        setText('field-accountname', '');
-        setText('field-addr1', '');
-        var addr2ElNoBank = document.getElementById('field-addr2');
-        if (addr2ElNoBank) {
-          addr2ElNoBank.style.display = 'none';
-          addr2ElNoBank.textContent = '';
-        }
-        setText('field-citystatezip', '');
-        setText('field-micr', record.MicrLine || record.Micr_Line || '');
       }
+
+      // MICR line: explicit field on CheckRegister wins; otherwise build from routing/account/check
+      var micr = record.MicrLine || record.Micr_Line;
+      if (!micr) {
+        var routing = bankRow.Routing_Number;
+        var account = bankRow.Account_Number;
+        var chk = record.Check_Number;
+        if (routing && account && chk != null && chk !== '') {
+          micr = 'A' + routing + 'A ' + String(chk) + 'C ' + account + 'C';
+        }
+      }
+      setText('field-micr', micr || '');
     }
 
     grist.onRecord(function(record) {
