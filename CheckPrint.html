@@ -629,7 +629,7 @@
         var account = bankRow.Account_Number;
         var chk = record.Check_Number;
         if (routing && account && chk != null && chk !== '') {
-          micr = 'A' + routing + 'A ' + String(chk) + 'C ' + account + 'C';
+          micr = 'A' + routing + 'A ' + account + 'C ' + chk + 'C';
         }
       }
       setText('field-micr', micr || '');
