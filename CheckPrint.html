@@ -496,6 +496,7 @@
             Zip: cols.Zip ? cols.Zip[i] : null,
             Bank_Name: cols.Bank_Name ? cols.Bank_Name[i] : null,
             Bank_Logo: cols.Bank_Logo ? cols.Bank_Logo[i] : null,
+            Bank_Logo_URL: cols.Bank_Logo_URL ? cols.Bank_Logo_URL[i] : null,
             Routing_Number: cols.Routing_Number ? cols.Routing_Number[i] : null,
             Account_Number: cols.Account_Number ? cols.Account_Number[i] : null
           };
@@ -608,40 +609,14 @@
       }
 
       // Bank logo from attachment (handles array or single id)
-// Bank logo from attachment (handles array or single id)
+      // Bank logo via URL column (Logo_URL)
 if (logoWrapper && logoImg) {
-  var logoCell = bankRow.Bank_Logo;
-  var logoIds = [];
+  var logoUrl = (bankRow.Logo_URL || '').toString().trim();
 
-  if (Array.isArray(logoCell)) {
-    logoIds = logoCell;
-  } else if (logoCell != null && logoCell !== '') {
-    logoIds = [logoCell];
-  }
-
-  if (logoIds.length > 0) {
-    try {
-      var attId = logoIds[0];
-
-      // fetchAttachment returns a Blob; turn it into an object URL
-      var blob = await grist.docApi.fetchAttachment(attId);
-      var url = URL.createObjectURL(blob);
-
-      logoImg.onload = function () {
-        // free memory after the image loads
-        URL.revokeObjectURL(url);
-        logoImg.onload = null;
-      };
-
-      logoImg.src = url;
-      logoImg.style.display = 'block';
-      logoWrapper.classList.add('has-logo');
-    } catch (e) {
-      console.error('Error loading bank logo attachment', e, 'logoCell:', logoCell);
-      logoImg.src = '';
-      logoImg.style.display = 'none';
-      logoWrapper.classList.remove('has-logo');
-    }
+  if (logoUrl) {
+    logoImg.src = logoUrl;
+    logoImg.style.display = 'block';
+    logoWrapper.classList.add('has-logo');
   } else {
     logoImg.src = '';
     logoImg.style.display = 'none';
