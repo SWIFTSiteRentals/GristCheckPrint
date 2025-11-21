@@ -506,7 +506,7 @@
       if (!record) return;
       console.log('Selected row:', record);
 
-      // Always show basic check fields
+      // Basic check fields
       setText('field-payto', record.Pay_To);
       setText('field-amount', formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
@@ -533,19 +533,33 @@
       }
 
       if (bankRow) {
-        // Account holder / business name
+        // 1) Account holder / business name
         var acctName = bankRow.Account_Holder_Name || bankRow.Account_Name || '';
         setText('field-accountname', acctName);
 
-        // Address lines
+        // 1) Address lines
         setText('field-addr1', bankRow.Street_Address_Line_1 || '');
-        setText('field-addr2', bankRow.Street_Address_Line_2 || '');
+
+        // Street Address Line 2: hide row entirely when blank
+        var addr2El = document.getElementById('field-addr2');
+        var addr2Val = bankRow.Street_Address_Line_2 || '';
+        if (addr2El) {
+          if (addr2Val) {
+            addr2El.style.display = '';
+            addr2El.textContent = addr2Val;
+          } else {
+            addr2El.style.display = 'none';
+            addr2El.textContent = '';
+          }
+        }
+
         setText('field-citystatezip', buildCityStateZip(bankRow));
 
-        // Bank name text fallback
-        setText('bank-logo-text', (bankRow.Bank_Name || '') + ' LOGO');
+        // 1 & 2) Bank name text fallback
+        var bankNameText = (bankRow.Bank_Name || '') + ' LOGO';
+        setText('bank-logo-text', bankNameText);
 
-        // Bank logo attachment
+        // 2) Bank logo attachment
         var logoWrapper = document.getElementById('field-banklogo');
         var logoImg = document.getElementById('bank-logo-img');
         var logoCell = bankRow.Bank_Logo;
@@ -558,6 +572,7 @@
               logoWrapper.classList.add('has-logo');
             } catch (e) {
               console.error('Error loading logo attachment', e);
+              logoImg.src = '';
               logoImg.style.display = 'none';
               logoWrapper.classList.remove('has-logo');
             }
@@ -576,7 +591,6 @@
           var chk = record.Check_Number;
           if (routing && account && chk != null) {
             // Basic E-13B style with transit (A) and on-us (C) symbols.
-            // Adjust pattern later if your bank needs something different.
             micr = 'A' + routing + 'A ' + String(chk) + 'C ' + account + 'C';
           }
         }
@@ -585,14 +599,17 @@
         // No bank record: clear header fields and MICR
         setText('field-accountname', '');
         setText('field-addr1', '');
-        setText('field-addr2', '');
+        var addr2ElNoBank = document.getElementById('field-addr2');
+        if (addr2ElNoBank) {
+          addr2ElNoBank.style.display = 'none';
+          addr2ElNoBank.textContent = '';
+        }
         setText('field-citystatezip', '');
         setText('field-micr', record.MicrLine || record.Micr_Line || '');
       }
     }
 
     grist.onRecord(function(record) {
-      // allow async work
       updateFromRecord(record);
     });
   </script>
