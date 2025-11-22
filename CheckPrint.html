@@ -63,7 +63,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: blue;
+      color: dimgrey;
       opacity: 0.40;
       pointer-events: none;
       display: none;
@@ -586,16 +586,30 @@
 
   <script>
 
-    function formatShortDate(raw) {
+// Format Check_Date into M/D/YY without timezone shift
+function formatShortDate(raw) {
   if (!raw) return '';
-  const d = new Date(raw);
-  if (isNaN(d)) return raw;
 
-  const m = d.getMonth() + 1;
-  const day = d.getDate();
-  const yy = String(d.getFullYear()).slice(-2);
+  // If Grist gives us a plain "YYYY-MM-DD" string, parse it manually
+  if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const [yearStr, monthStr, dayStr] = raw.split('-');
+    const m = Number(monthStr);   // 1–12
+    const d = Number(dayStr);     // 1–31
+    const yy = yearStr.slice(-2); // last 2 digits of year
+    return `${m}/${d}/${yy}`;
+  }
 
-  return `${m}/${day}/${yy}`;
+  // Fallback: if it's already a Date or some other format, do best effort
+  const dObj = new Date(raw);
+  if (!isNaN(dObj)) {
+    const m = dObj.getMonth() + 1;
+    const d = dObj.getDate();
+    const yy = String(dObj.getFullYear()).slice(-2);
+    return `${m}/${d}/${yy}`;
+  }
+
+  // If all else fails, just show the raw value
+  return String(raw);
 }
 
 
