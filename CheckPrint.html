@@ -417,15 +417,28 @@
       background: #ddd;
     }
 
-    @media print {
-      .print-button {
-        display: none;
-      }
-    }
-    .micr-debug-band,
-    .micr-debug-index {
-      display: none !important;
-    }
+@media print {
+  .print-button {
+    display: none;
+  }
+
+  /* Hide the little index numbers under each box */
+  .micr-debug-index {
+    display: none !important;
+  }
+
+  /* Remove grid / borders but keep the MICR characters */
+  .micr-debug-band {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .micr-debug-cell {
+    border-left-color: transparent;
+    border-right-color: transparent;
+  }
+}
+
 
   </style>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
