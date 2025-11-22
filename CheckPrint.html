@@ -63,7 +63,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: green;
+      color: blue;
       opacity: 0.40;
       pointer-events: none;
       display: none;
@@ -374,10 +374,10 @@
     .micr-debug-cell {
       border-left: 1px solid rgba(0,0,0,0.6);
       font-family: 'MICR';
-      font-size: 0.25in;          /* typical spec size; adjust if your MICR font doc says otherwise */
+      font-size: 0.30in;          /* typical spec size; adjust if your MICR font doc says otherwise */
       line-height: 0.25in;      /* fill the band vertically */
       text-align: right;        /* right-justify inside the box */
-      padding-right: 0.02in;    /* slight inset from the right wall */
+ /*     padding-right: 0.02in;    /* slight inset from the right wall */
       position: relative;
     }
 
@@ -585,6 +585,21 @@
   </div>
 
   <script>
+
+    function formatShortDate(raw) {
+  if (!raw) return '';
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  const yy = String(d.getFullYear()).slice(-2);
+
+  return `${m}/${day}/${yy}`;
+}
+
+
+    
     /* ===== BASIC HELPERS ===== */
     function setText(id, value) {
       var el = document.getElementById(id);
@@ -863,7 +878,7 @@
       setText('field-payto', record.Pay_To);
       setText('field-amount', formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
-      setText('field-checkdate', record.Check_Date);
+    setText('field-checkdate', formatShortDate(record.Check_Date));
       setText('field-memo', record.Memo);
       setText('field-amountwords', formatAmountInWords(record.Amount));
 
