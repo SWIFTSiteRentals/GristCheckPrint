@@ -418,16 +418,17 @@
     }
 
 @media print {
+
   .print-button {
     display: none;
   }
 
-  /* Hide the little index numbers under each box */
+  /* Hide the little index numbers under each MICR box */
   .micr-debug-index {
     display: none !important;
   }
 
-  /* Remove grid / borders but keep the MICR characters */
+  /* Remove grid borders / shading but keep the MICR characters */
   .micr-debug-band {
     border-color: transparent;
     background: transparent;
@@ -438,6 +439,9 @@
     border-right-color: transparent;
   }
 }
+
+    
+    }
 
 
   </style>
