@@ -63,7 +63,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: dimgrey;
+      color: green;
       opacity: 0.40;
       pointer-events: none;
       display: none;
@@ -83,7 +83,7 @@
     .account-block {
       max-width: 55%;
       line-height: 1.15;
-      margin-top: 0.08in;   /* adjust this value until it looks right */
+      margin-top: 0.08in;
     }
 
     .account-name {
@@ -167,8 +167,8 @@
       padding-right: 0.03in;
 
       /* pull the line left under "PAY TO THE ORDER OF" */
-      margin-left: -0.60in;   /* = .5in label width + 0.10in gap */
-      padding-left: 0.60in;   /* push the {{PayTo}} text back to where it was */
+      margin-left: -0.60in;
+      padding-left: 0.60in;
     }
 
     .amount-block-inline {
@@ -246,7 +246,7 @@
       align-items: center;
       position: relative;
       z-index: 2;
-      height: 0.75in;          /* fixed vertical space for logo row */
+      height: 0.75in;
     }
 
     .bank-logo-block {
@@ -341,49 +341,44 @@
       margin-left: 0.25in;
     }
 
-    /* ===== MICR DEBUG BAND & GRID (AND ACTUAL MICR LINE) ===== */
-
+    /* ===== MICR BAND & GRID (ACTUAL MICR LINE) ===== */
     .micr-debug-band {
       position: absolute;
       bottom: 0;
-      left: 0.25in;          /* align with check-area padding */
+      left: 0.25in;
       right: 0.25in;
-      height: 0.625in;       /* ANSI clear band height */
+      height: 0.625in;   /* ANSI clear band height */
       box-sizing: border-box;
       z-index: 1;
-      border: 1px solid rgba(0,0,0,0.6);
-      border-bottom: none;
-      background: rgba(255,255,255,0.6);
+      /* visuals will be stripped; band is just positional now */
+      border: none;
+      background: transparent;
     }
 
     .micr-debug-grid {
       position: absolute;
-      /* MICR character band: baseline ~0.19" above bottom, band ~0.25" high */
-      bottom: 0.19in;
+      bottom: 0.19in;     /* baseline about 3/16" up */
       left: 0;
       right: 0;
       height: 0.25in;
       display: grid;
-
-      /* 62 boxes, each 1/8" wide in print */
       grid-template-columns: repeat(62, 0.125in);
-
-      border-top: 1px solid rgba(0,0,0,0.7);
-      border-bottom: 1px solid rgba(0,0,0,0.7);
+      border-top: none;
+      border-bottom: none;
     }
 
     .micr-debug-cell {
-      border-left: 1px solid rgba(0,0,0,0.6);
+      border-left: none;
+      border-right: none;
       font-family: 'MICR';
-      font-size: 0.30in;          /* typical spec size; adjust if your MICR font doc says otherwise */
-      line-height: 0.25in;      /* fill the band vertically */
-      text-align: right;        /* right-justify inside the box */
- /*     padding-right: 0.02in;    /* slight inset from the right wall */
+      font-size: 0.30in;     /* adjust to match your reference checks */
+      line-height: 0.25in;
+      text-align: right;
       position: relative;
     }
 
     .micr-debug-cell:last-child {
-      border-right: 1px solid rgba(0,0,0,0.6);
+      border-right: none;
     }
 
     .micr-debug-char {
@@ -392,19 +387,13 @@
     }
 
     .micr-debug-index {
-      position: absolute;
-      bottom: -0.09in;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'Open Sans', Arial, sans-serif;
-      font-size: 6px;
-      color: #333;
+      display: none;         /* hide box numbers both screen & print */
     }
 
     /* ===== PRINT BUTTON ===== */
     .print-button {
       position: absolute;
-      bottom: 0.2in;
+      top: 4.0in;            /* ~0.5" below 3.5" check area */
       right: 0.25in;
       padding: 0.08in 0.25in;
       font-size: 11px;
@@ -419,78 +408,11 @@
       background: #ddd;
     }
 
-    /* ===== PRINT-ONLY CLEANUP (HIDE GRID, KEEP MICR CHARS) ===== */
     @media print {
-
       .print-button {
         display: none;
       }
-
-      /* hide little position numbers */
-      .micr-debug-index {
-        display: none !important;
-      }
-
-      /* kill outer box & tint */
-      .micr-debug-band {
-        border-color: transparent;
-        background: transparent;
-      }
-
-      /* kill grid top/bottom lines */
-      .micr-debug-grid {
-        border-top: none;
-        border-bottom: none;
-      }
-
-      /* kill vertical box borders, keep characters */
-      .micr-debug-cell {
-        border-left-color: transparent;
-        border-right-color: transparent;
-      }
     }
-
-    /* === REMOVE MICR GRID VISUALLY (SCREEN + PRINT) === */
-
-/* hide the tiny box-number labels (62, 61, ... 01) */
-.micr-debug-index {
-  display: none !important;
-}
-
-/* remove background + outer border of the grid band */
-.micr-debug-band {
-  border: none !important;
-  background: transparent !important;
-}
-
-/* remove left/right borders of each cell, so no grid lines appear */
-.micr-debug-cell {
-  border-left: none !important;
-  border-right: none !important;
-}
-
-/* --- Kill MICR debug grid visuals everywhere (screen + print) --- */
-.micr-debug-index {
-  display: none !important;   /* hide little box numbers */
-}
-
-.micr-debug-band {
-  border: none !important;
-  background: transparent !important;
-}
-
-.micr-debug-grid {
-  border-top: none !important;
-  border-bottom: none !important;
-}
-
-.micr-debug-cell {
-  border-left: none !important;
-  border-right: none !important;
-}
-
-
-    
   </style>
 
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
@@ -578,7 +500,7 @@
         </div>
       </div>
 
-      <!-- MICR BAND / GRID -->
+      <!-- MICR BAND / GRID (VISUAL GRID HIDDEN, MICR CHARS SHOWN) -->
       <div class="micr-debug-band">
         <div class="micr-debug-grid" id="micr-debug-grid"></div>
       </div>
@@ -586,35 +508,45 @@
   </div>
 
   <script>
+    // ===== DATE FORMATTING: M/D/YY, AVOIDING TIMEZONE SLIP =====
+    function formatShortDate(raw) {
+      if (raw == null || raw === '') return '';
 
-// Format Check_Date into M/D/YY without timezone shift
-function formatShortDate(raw) {
-  if (!raw) return '';
+      // If string, try to grab leading YYYY-MM-DD ignoring any time/zone
+      if (typeof raw === 'string') {
+        var m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) {
+          var month = parseInt(m[2], 10);
+          var day   = parseInt(m[3], 10);
+          var yy    = m[1].slice(-2);
+          return month + '/' + day + '/' + yy;
+        }
+      }
 
-  // If Grist gives us a plain "YYYY-MM-DD" string, parse it manually
-  if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-    const [yearStr, monthStr, dayStr] = raw.split('-');
-    const m = Number(monthStr);   // 1–12
-    const d = Number(dayStr);     // 1–31
-    const yy = yearStr.slice(-2); // last 2 digits of year
-    return `${m}/${d}/${yy}`;
-  }
+      // If it's already a Date object, use UTC parts so midnight-UTC
+      // stays the same calendar day instead of sliding back in PST
+      if (raw instanceof Date) {
+        var y  = raw.getUTCFullYear();
+        var mo = raw.getUTCMonth() + 1;
+        var d  = raw.getUTCDate();
+        var yy = String(y).slice(-2);
+        return mo + '/' + d + '/' + yy;
+      }
 
-  // Fallback: if it's already a Date or some other format, do best effort
-  const dObj = new Date(raw);
-  if (!isNaN(dObj)) {
-    const m = dObj.getMonth() + 1;
-    const d = dObj.getDate();
-    const yy = String(dObj.getFullYear()).slice(-2);
-    return `${m}/${d}/${yy}`;
-  }
+      // Fallback: best-effort parse, still using UTC components
+      var dObj = new Date(raw);
+      if (!isNaN(dObj)) {
+        var y2  = dObj.getUTCFullYear();
+        var m2  = dObj.getUTCMonth() + 1;
+        var d2  = dObj.getUTCDate();
+        var yy2 = String(y2).slice(-2);
+        return m2 + '/' + d2 + '/' + yy2;
+      }
 
-  // If all else fails, just show the raw value
-  return String(raw);
-}
+      // If nothing worked, show raw
+      return String(raw);
+    }
 
-
-    
     /* ===== BASIC HELPERS ===== */
     function setText(id, value) {
       var el = document.getElementById(id);
@@ -713,7 +645,7 @@ function formatShortDate(raw) {
     }
 
     /* ===== MICR GRID CREATION + UPDATE ===== */
-    var TOTAL_MICR_BOXES = 62;  // positions 62 (far left) .. 01 (far right)
+    var TOTAL_MICR_BOXES = 62;  // positions 62..01
 
     function initMicrGrid() {
       var grid = document.getElementById('micr-debug-grid');
@@ -822,7 +754,7 @@ function formatShortDate(raw) {
       return bankByAccountName[key] || null;
     }
 
-    // Build MICR box mapping from routing/account/check numbers per your layout spec.
+    // Build MICR box mapping from routing/account/check numbers
     function buildMicrBoxes(routing, account, checkNumber) {
       var boxes = new Array(TOTAL_MICR_BOXES + 1).fill('');
 
@@ -893,7 +825,7 @@ function formatShortDate(raw) {
       setText('field-payto', record.Pay_To);
       setText('field-amount', formatAmount(record.Amount));
       setText('field-checknum', record.Check_Number);
-    setText('field-checkdate', formatShortDate(record.Check_Date));
+      setText('field-checkdate', formatShortDate(record.Check_Date));
       setText('field-memo', record.Memo);
       setText('field-amountwords', formatAmountInWords(record.Amount));
 
