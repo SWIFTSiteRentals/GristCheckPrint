@@ -36,28 +36,14 @@
       padding: 0;
       font-family: 'Open Sans', Arial, sans-serif;
       font-size: 10.5px;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Wrapper that Grist resizes – we scale the page inside this */
-    .check-wrapper {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;              /* no internal scrolling */
-      display: flex;
-      justify-content: center;       /* center horizontally */
-      align-items: flex-start;       /* stick to top */
-      box-sizing: border-box;
+      overflow: hidden;          /* <-- stop scrolling inside the widget */
     }
 
     .page {
       width: 8.5in;
-      height: 11in;
+      height: 4.5in;             /* <-- only tall enough for check + button */
       position: relative;
       box-sizing: border-box;
-      transform-origin: top left;
-      transform: scale(1);
     }
 
     /* ===== CHECK AREA (EXACT 3.50") ===== */
@@ -78,7 +64,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: dimgrey;
+      color: blue;
       opacity: 0.40;
       pointer-events: none;
       display: none;
@@ -88,18 +74,19 @@
 
     /* ===== TOP HEADER ===== */
     .top-row {
-      position: relative;   /* for absolutely positioned address/date */
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
       z-index: 2;
-      height: 0.8in;        /* fixed header height so payee row stays put */
     }
 
-    /* Address block – now ABSOLUTE, so moving it won't push anything else */
     .account-block {
-      position: absolute;
-      top: 0.10in;          /* <-- vertical position of the address block */
-      left: 0;
       max-width: 55%;
       line-height: 1.15;
+      /* instead of margin-top, move it visually with transform
+         so the rest of the layout does NOT get pushed down */
+      transform: translateY(0.08in);
     }
 
     .account-name {
@@ -136,12 +123,17 @@
       text-align: right;
     }
 
+    .date-line {
+      display: inline-block;
+      min-width: 0.5in;
+      border-bottom: 1px solid #000;
+      margin-left: 0.10in;
+    }
+
     .check-number-block {
-      position: absolute;
-      top: 0.05in;
-      right: 0.25in;
       font-size: 16px;
       font-weight: bold;
+      margin-top: 0.05in;
     }
 
     /* ===== PAYEE ROW ===== */
@@ -422,136 +414,102 @@
       .print-button {
         display: none;
       }
-
-      /* For print: no scaling, real 8.5"×11" */
-      .check-wrapper {
-        overflow: visible;
-        display: block;
-      }
-
-      .page {
-        transform: none !important;
-      }
     }
   </style>
 
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 </head>
 <body>
-  <div class="check-wrapper">
-    <div class="page">
-      <button class="print-button" onclick="window.print()">Print</button>
+  <div class="page">
+    <button class="print-button" onclick="window.print()">Print</button>
 
-      <div class="check-area">
-        <!-- VOID WATERMARK -->
-        <div class="void-watermark" id="void-watermark">VOID</div>
+    <div class="check-area">
+      <!-- VOID WATERMARK -->
+      <div class="void-watermark" id="void-watermark">VOID</div>
 
-        <!-- TOP HEADER -->
-        <div class="top-row">
-          <div class="account-block">
-            <div class="account-name" id="field-accountname">{{AccountHolderName}}</div>
-            <div id="field-addr1">{{StreetAddressLine1}}</div>
-            <div id="field-addr2">{{StreetAddressLine2}}</div>
-            <div id="field-citystatezip">{{City}}, {{State}} {{Zip}}</div>
-          </div>
-
-          <div class="date-block">
-            <span class="date-value" id="field-checkdate">{{CheckDate}}</span>
-            <div class="date-underline"></div>
-            <div class="date-label">DATE</div>
-          </div>
-
-          <div class="check-number-block" id="field-checknum">
-            {{CheckNumber}}
-          </div>
+      <!-- TOP HEADER -->
+      <div class="top-row">
+        <div class="account-block">
+          <div class="account-name" id="field-accountname">{{AccountHolderName}}</div>
+          <div id="field-addr1">{{StreetAddressLine1}}</div>
+          <div id="field-addr2">{{StreetAddressLine2}}</div>
+          <div id="field-citystatezip">{{City}}, {{State}} {{Zip}}</div>
         </div>
 
-        <!-- PAYEE ROW -->
-        <div class="payee-row">
-          <div class="payee-label">
-            <div class="payee-label-inner">
-              PAY TO THE<br>ORDER OF
-            </div>
-          </div>
-          <div class="payee-line" id="field-payto">{{PayTo}}</div>
-          <div class="amount-block-inline">
-            <span class="amount-dollar">$</span>
-            <div class="amount-box" id="field-amount">{{Amount}}</div>
-          </div>
+        <div class="date-block">
+          <span class="date-value" id="field-checkdate">{{CheckDate}}</span>
+          <div class="date-underline"></div>
+          <div class="date-label">DATE</div>
         </div>
 
-        <!-- AMOUNT IN WORDS -->
-        <div class="amount-words-row">
-          <div class="amount-words-line">
-            <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
-            <span class="amount-words-filler">
-              <svg viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0,7 Q 50,1 100,7"
-                      fill="none"
-                      stroke="#000"
-                      stroke-width="1.2"
-                      stroke-linecap="round" />
-              </svg>
-            </span>
-          </div>
-          <div class="amount-words-dollars">DOLLARS</div>
+        <div class="check-number-block" id="field-checknum">
+          {{CheckNumber}}
         </div>
+      </div>
 
-        <!-- BANK LOGO -->
-        <div class="bank-row">
-          <div class="bank-logo-block">
-            <div class="bank-logo" id="field-banklogo">
-              <img id="bank-logo-img" alt="Bank logo" />
-              <span id="bank-logo-text">{{BankName}} LOGO</span>
-            </div>
+      <!-- PAYEE ROW -->
+      <div class="payee-row">
+        <div class="payee-label">
+          <div class="payee-label-inner">
+            PAY TO THE<br>ORDER OF
           </div>
         </div>
+        <div class="payee-line" id="field-payto">{{PayTo}}</div>
+        <div class="amount-block-inline">
+          <span class="amount-dollar">$</span>
+          <div class="amount-box" id="field-amount">{{Amount}}</div>
+        </div>
+      </div>
 
-        <!-- MEMO + SIGNATURE -->
-        <div class="bottom-row">
-          <div class="memo-wrapper">
-            <div class="memo-line">
-              <span id="field-memo"></span>
-            </div>
-            <div class="memo-label">MEMO</div>
-          </div>
+      <!-- AMOUNT IN WORDS -->
+      <div class="amount-words-row">
+        <div class="amount-words-line">
+          <span class="amount-words-text" id="field-amountwords">{{AmountInWords}}</span>
+          <span class="amount-words-filler">
+            <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+              <path d="M0,7 Q 50,1 100,7"
+                    fill="none"
+                    stroke="#000"
+                    stroke-width="1.2"
+                    stroke-linecap="round" />
+            </svg>
+          </span>
+        </div>
+        <div class="amount-words-dollars">DOLLARS</div>
+      </div>
 
-          <div class="signature-container">
-            <div class="signature-line"></div>
+      <!-- BANK LOGO -->
+      <div class="bank-row">
+        <div class="bank-logo-block">
+          <div class="bank-logo" id="field-banklogo">
+            <img id="bank-logo-img" alt="Bank logo" />
+            <span id="bank-logo-text">{{BankName}} LOGO</span>
           </div>
         </div>
+      </div>
 
-        <!-- MICR BAND / GRID (VISUAL GRID HIDDEN, MICR CHARS SHOWN) -->
-        <div class="micr-debug-band">
-          <div class="micr-debug-grid" id="micr-debug-grid"></div>
+      <!-- MEMO + SIGNATURE -->
+      <div class="bottom-row">
+        <div class="memo-wrapper">
+          <div class="memo-line">
+            <span id="field-memo"></span>
+          </div>
+          <div class="memo-label">MEMO</div>
         </div>
+
+        <div class="signature-container">
+          <div class="signature-line"></div>
+        </div>
+      </div>
+
+      <!-- MICR BAND / GRID (VISUAL GRID HIDDEN, MICR CHARS SHOWN) -->
+      <div class="micr-debug-band">
+        <div class="micr-debug-grid" id="micr-debug-grid"></div>
       </div>
     </div>
   </div>
 
   <script>
-    // ===== Fit the 8.5x11 page into whatever space Grist gives this widget =====
-    function fitPageToWrapper() {
-      var wrapper = document.querySelector('.check-wrapper');
-      var page = document.querySelector('.page');
-      if (!wrapper || !page) return;
-
-      // reset scale to measure natural size
-      page.style.transform = 'scale(1)';
-
-      var wrapperW = wrapper.clientWidth;
-      var wrapperH = wrapper.clientHeight;
-
-      var pageW = page.offsetWidth;
-      var pageH = page.offsetHeight;
-
-      if (!pageW || !pageH) return;
-
-      var scale = Math.min(wrapperW / pageW, wrapperH / pageH);
-
-      page.style.transform = 'scale(' + scale + ')';
-    }
-
     // ===== DATE FORMATTING: M/D/YY, AVOIDING TIMEZONE SLIP =====
     function formatShortDate(raw) {
       if (raw == null || raw === '') return '';
@@ -964,7 +922,6 @@
     /* ===== STARTUP ===== */
     document.addEventListener('DOMContentLoaded', function () {
       initMicrGrid();          // build empty 62-box grid
-      fitPageToWrapper();      // initial scale to fit widget
 
       if (window.grist && typeof grist.ready === 'function') {
         grist.ready();
@@ -974,8 +931,6 @@
           });
         }
       }
-
-      window.addEventListener('resize', fitPageToWrapper);
     });
   </script>
 </body>
