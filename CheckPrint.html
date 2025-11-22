@@ -64,7 +64,7 @@
       font-size: 300px;
       letter-spacing: 0.12em;
       color: dimgrey;
-      opacity: 0.10;
+      opacity: 0.20;
       pointer-events: none;
       display: none;
       z-index: 1;
@@ -374,7 +374,7 @@
     .micr-debug-cell {
       border-left: 1px solid rgba(0,0,0,0.6);
       font-family: 'MICR';
-      font-size: 10pt;          /* typical spec size; adjust if your MICR font doc says otherwise */
+      font-size: 0.125in;          /* typical spec size; adjust if your MICR font doc says otherwise */
       line-height: 0.25in;      /* fill the band vertically */
       text-align: right;        /* right-justify inside the box */
       padding-right: 0.02in;    /* slight inset from the right wall */
@@ -448,6 +448,27 @@
         border-right-color: transparent;
       }
     }
+
+    /* === REMOVE MICR GRID VISUALLY (SCREEN + PRINT) === */
+
+/* hide the tiny box-number labels (62, 61, ... 01) */
+.micr-debug-index {
+  display: none !important;
+}
+
+/* remove background + outer border of the grid band */
+.micr-debug-band {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* remove left/right borders of each cell, so no grid lines appear */
+.micr-debug-cell {
+  border-left: none !important;
+  border-right: none !important;
+}
+
+    
   </style>
 
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
