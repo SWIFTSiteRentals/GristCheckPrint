@@ -63,8 +63,8 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: purple;
-      opacity: 0.15;
+      color: dimgrey;
+      opacity: 0.10;
       pointer-events: none;
       display: none;
       z-index: 1;
@@ -340,7 +340,8 @@
       margin-left: 0.25in;
     }
 
-    /* ===== MICR DEBUG BAND & GRID (ALSO SERVES AS ACTUAL MICR LINE) ===== */
+    /* ===== MICR DEBUG BAND & GRID (AND ACTUAL MICR LINE) ===== */
+
     .micr-debug-band {
       position: absolute;
       bottom: 0;
@@ -373,7 +374,7 @@
     .micr-debug-cell {
       border-left: 1px solid rgba(0,0,0,0.6);
       font-family: 'MICR';
-      font-size: 10pt;          /* typical spec size, adjust if your MICR font doc says otherwise */
+      font-size: 10pt;          /* typical spec size; adjust if your MICR font doc says otherwise */
       line-height: 0.25in;      /* fill the band vertically */
       text-align: right;        /* right-justify inside the box */
       padding-right: 0.02in;    /* slight inset from the right wall */
@@ -417,34 +418,38 @@
       background: #ddd;
     }
 
-@media print {
+    /* ===== PRINT-ONLY CLEANUP (HIDE GRID, KEEP MICR CHARS) ===== */
+    @media print {
 
-  .print-button {
-    display: none;
-  }
+      .print-button {
+        display: none;
+      }
 
-  /* Hide the little index numbers under each MICR box */
-  .micr-debug-index {
-    display: none !important;
-  }
+      /* hide little position numbers */
+      .micr-debug-index {
+        display: none !important;
+      }
 
-  /* Remove grid borders / shading but keep the MICR characters */
-  .micr-debug-band {
-    border-color: transparent;
-    background: transparent;
-  }
+      /* kill outer box & tint */
+      .micr-debug-band {
+        border-color: transparent;
+        background: transparent;
+      }
 
-  .micr-debug-cell {
-    border-left-color: transparent;
-    border-right-color: transparent;
-  }
-}
+      /* kill grid top/bottom lines */
+      .micr-debug-grid {
+        border-top: none;
+        border-bottom: none;
+      }
 
-    
+      /* kill vertical box borders, keep characters */
+      .micr-debug-cell {
+        border-left-color: transparent;
+        border-right-color: transparent;
+      }
     }
-
-
   </style>
+
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 </head>
 <body>
@@ -530,7 +535,7 @@
         </div>
       </div>
 
-      <!-- MICR DEBUG BAND + GRID (also used as actual MICR line when you hide borders) -->
+      <!-- MICR BAND / GRID -->
       <div class="micr-debug-band">
         <div class="micr-debug-grid" id="micr-debug-grid"></div>
       </div>
@@ -749,15 +754,15 @@
     function buildMicrBoxes(routing, account, checkNumber) {
       var boxes = new Array(TOTAL_MICR_BOXES + 1).fill('');
 
-      // Sanitize to digits only
+      // digits only
       routing = (routing || '').toString().replace(/\D/g, '');
       account = (account || '').toString().replace(/\D/g, '');
       checkNumber = (checkNumber || '').toString().replace(/\D/g, '');
 
-      // Ensure routing is at most 9 digits (typical)
+      // routing: max 9 digits
       routing = routing.slice(0, 9);
 
-      // Use last 4 digits of check number, left-padded with zeros
+      // check: last 4 digits, zero-padded
       checkNumber = checkNumber.slice(-4);
       checkNumber = checkNumber.padStart(4, '0');
 
@@ -778,7 +783,7 @@
       // Box 52: trailing transit
       boxes[52] = TRANSIT;
 
-      // Boxes 51..49: blanks by design
+      // Boxes 51..49: blanks
 
       // Box 48: account start symbol
       boxes[48] = ONUS;
@@ -790,7 +795,7 @@
         pos--;
       }
 
-      // Next box: trailing ONUS if we still have room
+      // Trailing ONUS if room
       if (pos >= 1) {
         boxes[pos] = ONUS;
         pos--;
@@ -800,13 +805,12 @@
       pos -= 3;
       if (pos < 1) pos = 1;
 
-      // Check number: 4 boxes starting at current pos downwards
+      // Check number: 4 boxes starting at current pos downward
       for (var k = 0; k < checkNumber.length && pos >= 1; k++) {
         boxes[pos] = checkNumber[k];
         pos--;
       }
 
-      // Remaining boxes stay blank
       return boxes;
     }
 
@@ -828,7 +832,7 @@
         voidEl.style.display = status.startsWith('void') ? 'block' : 'none';
       }
 
-      // Clear header before filling
+      // Clear header
       setText('field-accountname', '');
       setText('field-addr1', '');
       var addr2El = document.getElementById('field-addr2');
