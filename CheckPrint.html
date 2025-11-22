@@ -36,11 +36,12 @@
       padding: 0;
       font-family: 'Open Sans', Arial, sans-serif;
       font-size: 10.5px;
+      overflow: hidden;          /* <-- stop scrolling inside the widget */
     }
 
     .page {
       width: 8.5in;
-      height: 11in;
+      height: 4.5in;             /* <-- only tall enough for check + button */
       position: relative;
       box-sizing: border-box;
     }
@@ -63,7 +64,7 @@
       font-family: 'Norwester', Arial, sans-serif;
       font-size: 300px;
       letter-spacing: 0.12em;
-      color: DimGrey;
+      color: blue;
       opacity: 0.40;
       pointer-events: none;
       display: none;
@@ -83,7 +84,9 @@
     .account-block {
       max-width: 55%;
       line-height: 1.15;
-      margin-top: 0.08in;
+      /* instead of margin-top, move it visually with transform
+         so the rest of the layout does NOT get pushed down */
+      transform: translateY(0.08in);
     }
 
     .account-name {
@@ -350,7 +353,6 @@
       height: 0.625in;   /* ANSI clear band height */
       box-sizing: border-box;
       z-index: 1;
-      /* visuals will be stripped; band is just positional now */
       border: none;
       background: transparent;
     }
@@ -512,7 +514,7 @@
     function formatShortDate(raw) {
       if (raw == null || raw === '') return '';
 
-      // If string, try to grab leading YYYY-MM-DD ignoring any time/zone
+      // If string like "2025-01-15" or "2025-01-15T..." – take the leading date part
       if (typeof raw === 'string') {
         var m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (m) {
@@ -523,8 +525,7 @@
         }
       }
 
-      // If it's already a Date object, use UTC parts so midnight-UTC
-      // stays the same calendar day instead of sliding back in PST
+      // If it's already a Date object, use UTC so it doesn't slide by timezone
       if (raw instanceof Date) {
         var y  = raw.getUTCFullYear();
         var mo = raw.getUTCMonth() + 1;
@@ -533,7 +534,7 @@
         return mo + '/' + d + '/' + yy;
       }
 
-      // Fallback: best-effort parse, still using UTC components
+      // Fallback: try to parse, still using UTC components
       var dObj = new Date(raw);
       if (!isNaN(dObj)) {
         var y2  = dObj.getUTCFullYear();
@@ -543,7 +544,6 @@
         return m2 + '/' + d2 + '/' + yy2;
       }
 
-      // If nothing worked, show raw
       return String(raw);
     }
 
